@@ -1,0 +1,12 @@
+node_modules
+dist
+.next
+.env
+__pycache__
+.venv
+.turbo
+
+e2e/test-results
+e2e/playwright-report
+test-results
+*.tsbuildinfo

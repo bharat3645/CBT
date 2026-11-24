@@ -1,0 +1,2 @@
+ALTER TABLE "ingestion_drafts" ADD COLUMN "question_id" uuid;--> statement-breakpoint
+ALTER TABLE "ingestion_drafts" ADD CONSTRAINT "ingestion_drafts_question_id_questions_id_fk" FOREIGN KEY ("question_id") REFERENCES "public"."questions"("id") ON DELETE set null ON UPDATE no action;
