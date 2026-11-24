@@ -53,7 +53,7 @@ export function PaperList({ title, filter, base = "/teacher" }: { title: string;
       ) : rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">Nothing here.</p>
       ) : (
-        <table className="w-full text-left text-sm">
+        <div className="overflow-x-auto"><table className="w-full text-left text-sm">
           <thead>
             <tr>
               <th className="border-b p-2">Paper</th>
@@ -74,7 +74,7 @@ export function PaperList({ title, filter, base = "/teacher" }: { title: string;
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
     </div>
   );

@@ -35,3 +35,7 @@ Demo logins (password `Passw0rd!Passw0rd`): `admin@`, `teacher@`, `student@`, `p
 - Questions promoted from papers have no syllabus topics, so topic analytics show "Untagged" until topics are tagged.
 - Not built: phone/OTP login, 2FA, impersonation, subjective-question marking, attendance, proctoring and lockdown (Phases 2 to 4).
 - Dev servers hot-reload; run the stack from a quiet tree for e2e.
+
+## Mobile
+
+Checked at 390px width (e2e/tests/30-mobile.spec.ts): no horizontal overflow on admin, teacher and student key pages. Screenshots are in demo/screenshots/mobile-*.png.
