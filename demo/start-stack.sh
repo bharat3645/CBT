@@ -4,7 +4,8 @@
 #            (Docling is heavy; for the POC the light path works: DOCPARSE_USE_DOCLING=false uses python-docx/pdfplumber.)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PY="${DOCPARSE_PY:-services/docparse/.venv/Scripts/python.exe}"
+if [ -x services/docparse/.venv/bin/python ]; then DEFAULT_PY=services/docparse/.venv/bin/python; else DEFAULT_PY=services/docparse/.venv/Scripts/python.exe; fi
+PY="${DOCPARSE_PY:-$DEFAULT_PY}"
 LOGS="${LOGS:-.logs}"; mkdir -p "$LOGS"
 
 docker compose up -d postgres valkey seaweedfs gotenberg mailpit clamav

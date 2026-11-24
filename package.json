@@ -8,7 +8,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "e2e": "pnpm --filter e2e test"
+    "e2e": "pnpm --filter e2e e2e"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

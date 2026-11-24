@@ -4,8 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current state
 
-The monorepo exists and the MVP flow runs end to end as a local POC (see `demo/README.md` for the demo script and known limits).
-The PRD (`Exam Prep Platform - Build PRD (Open-Source Building Blocks).md`) is the source of intent; the SRS PDF is in the repo root.
+The monorepo exists and the MVP flow runs end to end as a local POC (see `docs/demo.md` for the demo script and known limits).
+The PRD (`docs/PRD.md`) is the source of intent; the SRS is `docs/SRS.pdf`.
 
 ## Commands
 

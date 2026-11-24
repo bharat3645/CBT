@@ -1,6 +1,6 @@
 # PrepDesk CBT platform: runnable POC
 
-Everything below runs locally. `demo/start-stack.sh` starts it; `pnpm --filter e2e test` (from the repo root) replays the
+Everything below runs locally. `demo/start-stack.sh` starts it; `pnpm e2e` replays the
 whole story in a real browser (Playwright) and writes screenshots to `demo/screenshots/`.
 
 ## Services
