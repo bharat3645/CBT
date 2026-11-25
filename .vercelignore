@@ -1,0 +1,16 @@
+.git
+.logs
+node_modules
+**/node_modules
+e2e
+demo
+docs
+services
+docker
+apps/api
+apps/worker
+**/.next
+**/.turbo
+*.png
+*.webp
+!apps/web/public/**

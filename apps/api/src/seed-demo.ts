@@ -11,7 +11,7 @@ import { and, eq } from "drizzle-orm";
 import { DEFAULT_PRESETS } from "@cbt/contracts/exams";
 import { questionPayloadSchema, type QuestionPayload } from "@cbt/contracts";
 import {
-  accounts, attemptAnswers, attemptIncidents, attempts, batchTeachers, batchTopicProgress, batches, enrolments,
+  accounts, attendanceRecords, teacherFeedback, attemptAnswers, attemptIncidents, attempts, batchTeachers, batchTopicProgress, batches, enrolments,
   evaluationItems, evaluations, guardianStudentLinks, guardians, ingestionDrafts, ingestionPapers, memberships, notifications,
   questionTopics, questionVersions, questions, rankings, resultSettings, students, syllabusNodes, teachers, tests, users, type Db,
 } from "@cbt/db";
@@ -441,6 +441,37 @@ export async function seedDemoAcademy(db: Db, instituteId: string): Promise<stri
       status: (i < done ? "completed" : i === done ? "in_progress" : "not_started") as "completed" | "in_progress" | "not_started",
       note: i === done ? "Currently teaching" : null, completedAt: i < done ? new Date(now - (done - i + 3) * 2 * DAY) : null,
     })));
+  }
+
+  // ---- attendance history (last 3 weeks of weekdays) and a few teacher feedback notes ------------------------------------
+  {
+    const rows: (typeof attendanceRecords.$inferInsert)[] = [];
+    const markedBy = teacherIds.get("Physics")!.userId;
+    for (const s of everyone) {
+      let n = 0;
+      for (let d = 1; d <= 21; d++) {
+        const day = new Date(now - d * DAY);
+        if (day.getDay() === 0 || day.getDay() === 6) continue;
+        n++;
+        const h = createHash("md5").update(`${s.name}:${d}`).digest()[0]! / 255; // deterministic, so resets look the same
+        const demo = s.name === "Demo Student";
+        const status = demo ? (n === 4 ? "absent" : n === 9 ? "late" : "present") : h < 0.07 ? "absent" : h < 0.13 ? "late" : h < 0.16 ? "excused" : "present";
+        rows.push({ instituteId, batchId: batchRows.get(s.batch)!, studentUserId: s.userId, onDate: day.toISOString().slice(0, 10), status, markedBy });
+      }
+    }
+    for (let i = 0; i < rows.length; i += 300) await db.insert(attendanceRecords).values(rows.slice(i, i + 300)).onConflictDoNothing();
+    const demoStudent = studentByName.get("Demo Student");
+    const notes: [string, string][] = [
+      ["Physics", "Strong on kinematics and Newton's laws. Spend 20 minutes a day on electrostatics problems: Coulomb's law and capacitors are where marks are slipping."],
+      ["Chemistry", "Good numerical accuracy in thermodynamics. Revise inductive and resonance effects, and practise hybridisation questions from the bank."],
+      ["Maths", "Calculus is improving. Focus on area under curves and definite integrals before Mock 3."],
+    ];
+    if (demoStudent) for (const [subj, body] of notes) {
+      const t = teacherIds.get(subj);
+      if (!t) continue;
+      const [u] = await db.select({ name: users.name }).from(users).where(eq(users.id, t.userId)).limit(1);
+      await db.insert(teacherFeedback).values({ instituteId, studentUserId: demoStudent.userId, authorId: t.userId, authorName: u?.name ?? `${subj} teacher`, body });
+    }
   }
 
   // ---- notifications ----------------------------------------------------------------------------------------------------
