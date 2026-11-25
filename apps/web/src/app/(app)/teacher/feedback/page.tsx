@@ -1,4 +1,4 @@
-import { TeacherFeedbackPage } from "@/features/phase2/Phase2Pages";
+import { TeacherFeedbackPage } from "@/features/feedback/feedback-pages";
 
 export default function Page() {
   return <TeacherFeedbackPage />;

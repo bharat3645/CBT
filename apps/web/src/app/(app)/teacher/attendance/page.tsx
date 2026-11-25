@@ -1,4 +1,4 @@
-import { TeacherAttendancePage } from "@/features/phase2/Phase2Pages";
+import { TeacherAttendancePage } from "@/features/attendance/attendance-pages";
 
 export default function Page() {
   return <TeacherAttendancePage />;

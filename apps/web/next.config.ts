@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Local demo builds use NEXT_DIST_DIR=.next-demo so they never clobber the dev server's .next folder.
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   transpilePackages: ["@cbt/ui"],
   // Escape hatch during parallel feature development only: SKIP_TYPECHECK=1 pnpm --filter web build
   typescript: { ignoreBuildErrors: process.env.SKIP_TYPECHECK === "1" },

@@ -11,3 +11,4 @@ e2e/playwright-report
 test-results
 *.tsbuildinfo
 .logs
+.next-demo

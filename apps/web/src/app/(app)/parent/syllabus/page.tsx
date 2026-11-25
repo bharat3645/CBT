@@ -1,4 +1,4 @@
-import { SyllabusPage } from "@/features/syllabus/SyllabusPage";
+import { SyllabusPage } from "@/features/syllabus/syllabus-page";
 
 export default function Page() {
   return <SyllabusPage role="parent" />;

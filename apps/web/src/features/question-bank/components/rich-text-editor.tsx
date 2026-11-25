@@ -8,7 +8,7 @@ import { Bold, ImagePlus, Italic, List, ListOrdered, Sigma, Underline as Underli
 import { Button, cn } from '@cbt/ui';
 import 'katex/dist/katex.min.css';
 import type { RichDoc } from '@cbt/contracts';
-import { MathField } from './MathField';
+import { MathField } from './math-field';
 
 /** Block image node. `src` is a data URL (images are embedded in the question document). */
 const QuestionImage = Node.create({

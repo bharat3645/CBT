@@ -12,7 +12,7 @@ import {
   useBatchProgress, useCopyTemplate, useCreateNode, useDeleteNode, useRenameNode, useSetProgress, useSyllabusTree, useTemplates,
   type ProgressStatus,
 } from "./api";
-import { SyllabusTree, type TreeActions } from "./SyllabusTree";
+import { SyllabusTree, type TreeActions } from "./syllabus-tree";
 
 type Role = "admin" | "teacher" | "student" | "parent";
 

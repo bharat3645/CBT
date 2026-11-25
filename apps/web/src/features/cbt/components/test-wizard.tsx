@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import { api } from "@/lib/api-client";
+import { errorText } from "@/components/ui-kit";
 import { DEFAULT_PRESETS, PRESET_KEYS, createTestInput, type PresetKey } from "@cbt/contracts/exams";
 
 const STEPS = ["Paper & sections", "Preset", "Schedule", "Review"] as const;
@@ -54,16 +56,9 @@ export function TestWizard({ papers, batches = [], onDone }: { papers: WizardPap
     const p = payload();
     if (!p.success) return setErr(p.error.issues[0]?.message ?? "Invalid");
     setBusy(true); setErr(null);
-    const fail = async (r: Response, what: string) => {
-      const m = (await r.json().catch(() => null))?.message;
-      return new Error(typeof m === "string" ? `${what}: ${m}` : what);
-    };
     try {
-      const r = await fetch("/api/v1/tests", { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify(p.data) });
-      if (!r.ok) throw await fail(r, "Create failed");
-      const t = await r.json();
-      const pub = await fetch(`/api/v1/tests/${t.id}/publish`, { method: "POST", credentials: "include" });
-      if (!pub.ok) throw await fail(pub, "Publish failed");
+      const t = await api<{ id: string }>("/tests", { method: "POST", body: p.data }).catch((e) => { throw new Error(`Create failed: ${errorText(e)}`); });
+      await api(`/tests/${t.id}/publish`, { method: "POST" }).catch((e) => { throw new Error(`Publish failed: ${errorText(e)}`); });
       onDone?.(t.id, p.data.title);
       setStep(0);
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }

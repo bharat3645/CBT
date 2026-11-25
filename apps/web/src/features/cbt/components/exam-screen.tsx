@@ -5,14 +5,10 @@ import { useExamStore } from "../lib/exam-store";
 import { remainingFromSync, type ExamQuestion } from "../lib/exam-machine";
 import { enqueue, flush } from "../lib/outbox";
 import { requestFullscreen, useStrictMode } from "../lib/use-strict-mode";
+import { api } from "@/lib/api-client";
 import { ActionBar, Palette, QuestionPane, TopBar } from "./exam-parts";
 
-const API = "/api/v1";
-const post = async (path: string, body?: unknown) => {
-  const r = await fetch(API + path, { method: "POST", headers: { "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
-  if (!r.ok) throw Object.assign(new Error(String(r.status)), { status: r.status });
-  return r.json();
-};
+const post = <T = any,>(path: string, body?: unknown) => api<T>(path, { method: "POST", body });
 
 /**
  * Full-screen live exam. No sidebar. The question content is fetched from
@@ -41,7 +37,7 @@ export function ExamScreen(props: {
         const secs: { name: string; questionIds: string[] }[] = r.sections;
         const qs = props.loadQuestions
           ? await props.loadQuestions(r.attemptId, secs)
-          : await fetch(`${API}/attempts/${r.attemptId}/questions`).then((x) => x.json());
+          : await api<ExamQuestion[]>(`/attempts/${r.attemptId}/questions`);
         if (dead) return;
         setTitle(r.title);
         dispatch({ type: "LOADED", attemptId: r.attemptId, config: r.config, questions: qs, sections: secs.map((x) => x.name),

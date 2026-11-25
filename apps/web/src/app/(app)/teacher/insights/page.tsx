@@ -1,4 +1,4 @@
-import { BatchInsightsPage } from "@/features/mounts/insights-pages";
+import { BatchInsightsPage } from "@/features/route-pages/insights-pages";
 
 export default function Page() {
   return <BatchInsightsPage />;

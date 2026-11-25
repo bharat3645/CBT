@@ -7,7 +7,7 @@
  * What is simulated: sign-in (the four demo accounts), and writes. Writes are acknowledged and the interactive flows
  * (attendance, feedback, practice answers, exam answers) keep their state in this browser tab so the demo feels live.
  */
-import { DEMO_PASSWORD, DEMO_USERS, roleHome, type DemoRole } from "./accounts";
+import { DEMO_PASSWORD, DEMO_USERS, type DemoRole } from "./accounts";
 
 type Entry = { status: number; body: any };
 type Snapshot = {
@@ -49,7 +49,7 @@ function save(s: State) {
 }
 
 /* ---------- role / session ---------- */
-export const getRole = (): DemoRole | null => {
+const getRole = (): DemoRole | null => {
   try {
     return (localStorage.getItem(ROLE_KEY) as DemoRole | null) ?? null;
   } catch {
@@ -236,5 +236,3 @@ function safeParse(t: string) {
     return undefined;
   }
 }
-
-export { roleHome };

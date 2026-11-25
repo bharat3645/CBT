@@ -5,9 +5,9 @@ import { ChevronLeft, ChevronRight, Plus, Upload } from "lucide-react";
 import { Button } from "@cbt/ui";
 import { PageHeader } from "@/components/dashboard-kit";
 import { EmptyState, ErrorNote, Loading, Pill, Table, Td, inputCls } from "@/components/ui-kit";
-import { AddPersonForm } from "./AddPersonForm";
-import { GuardianLinksPanel } from "./GuardianLinksPanel";
-import { ImportCsvPanel } from "./ImportCsvPanel";
+import { AddPersonForm } from "./add-person-form";
+import { GuardianLinksPanel } from "./guardian-links-panel";
+import { ImportCsvPanel } from "./import-csv-panel";
 import { PAGE_SIZE, useBatches, usePeople, useSetPersonStatus, type Person, type PersonRole } from "./api";
 
 const COPY: Record<PersonRole, { title: string; singular: string; subtitle: string }> = {

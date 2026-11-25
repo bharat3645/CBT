@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input, Label } from "@cbt/ui";
 import { signIn } from "@/lib/auth-client";
+import { api, ApiError } from "@/lib/api-client";
+import { errorText } from "@/components/ui-kit";
 import { IS_DEMO } from "@/lib/demo/flag";
 import { DEMO_PASSWORD, DEMO_USERS } from "@/lib/demo/accounts";
 
@@ -36,14 +38,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     try {
       if (isSignup) {
         // Institute registration (FR-001): creates the admin account and a PENDING institute; the platform owner approves it.
-        const r = await fetch("/api/v1/institutes", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ name: String(fd.get("institute")), adminName: String(fd.get("name")), adminEmail: email, password }),
-        });
-        if (!r.ok) {
-          const body = (await r.json().catch(() => null)) as { message?: string | string[] } | null;
-          setError(r.status === 429 ? "Too many attempts. Please wait a minute and try again." : (Array.isArray(body?.message) ? body?.message[0] : body?.message) ?? "Could not register the institute");
+        try {
+          await api("/institutes", { method: "POST", body: { name: String(fd.get("institute")), adminName: String(fd.get("name")), adminEmail: email, password } });
+        } catch (e) {
+          setError(e instanceof ApiError && e.status === 429 ? "Too many attempts. Please wait a minute and try again." : errorText(e, "Could not register the institute"));
           return;
         }
         setRegistered(String(fd.get("institute")));
@@ -55,13 +53,8 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         return;
       }
       // The sign-in payload has no role; the API's /me returns the caller's role in their institute.
-      let role = "admin";
-      try {
-        const me = await fetch("/api/v1/me", { credentials: "include" });
-        if (me.ok) role = ((await me.json()) as { role?: string }).role ?? role;
-      } catch {
-        /* fall back to the admin home */
-      }
+      const me = await api<{ role?: string }>("/me").catch(() => null); // no role: fall back to the admin home
+      const role = me?.role ?? "admin";
       router.push(params.get("next") ?? homeFor[role] ?? "/admin");
     } catch {
       setError("Cannot reach the server. Please try again.");

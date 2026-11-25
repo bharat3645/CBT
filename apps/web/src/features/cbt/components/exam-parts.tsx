@@ -2,7 +2,7 @@
 import type { QuestionStatus } from "@cbt/contracts/exams";
 import type { RichDoc } from "@cbt/contracts";
 import "katex/dist/katex.min.css";
-import { RichTextView } from "@/features/question-bank/components/RichTextView";
+import { RichTextView } from "@/features/question-bank/components/rich-text-view";
 import type { ExamQuestion, ExamState, SaveState } from "../lib/exam-machine";
 import { paletteCounts } from "../lib/exam-machine";
 

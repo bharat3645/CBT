@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, apiText } from "@/lib/api-client";
 
 export type PersonRole = "student" | "teacher" | "parent";
 
@@ -122,9 +122,7 @@ export function useImportUsers() {
 
 /** Fetch text (CSV) with the session cookie, then hand it to the browser as a download. */
 export async function downloadCsv(path: string, filename: string) {
-  const res = await fetch(`/api/v1${path}`, { credentials: "include" });
-  if (!res.ok) throw new Error(`Download failed (${res.status})`);
-  const blob = new Blob([await res.text()], { type: "text/csv" });
+  const blob = new Blob([await apiText(path)], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

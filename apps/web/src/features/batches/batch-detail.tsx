@@ -7,7 +7,7 @@ import { Button } from "@cbt/ui";
 import { PageHeader } from "@/components/dashboard-kit";
 import { EmptyState, ErrorNote, Loading, Panel, Pill, Table, Td, inputCls } from "@/components/ui-kit";
 import { usePeople } from "@/features/people/api";
-import { BatchSyllabusProgress } from "@/features/syllabus/SyllabusPage";
+import { BatchSyllabusProgress } from "@/features/syllabus/syllabus-page";
 import { useAssignTeacher, useBatch, useEnrol, useUnassignTeacher, useUnenrol, useUpdateBatch } from "./api";
 
 /** Roster (students and teachers) plus per-batch syllabus progress. Admins edit the roster; teachers view it and mark progress. */

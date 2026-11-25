@@ -1,4 +1,4 @@
-import { EditQuestionPage } from "@/features/mounts/question-pages";
+import { EditQuestionPage } from "@/features/route-pages/question-pages";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

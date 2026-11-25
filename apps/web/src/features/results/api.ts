@@ -1,12 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
+import { api, ApiError } from '@/lib/api-client';
 import type { BatchAnalytics, ResultView, StudentAnalytics, LeaderboardRow } from '@cbt/contracts/results';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
-
+/** Shared transport, with friendlier wording for the two statuses students actually hit. */
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}/api/v1${path}`, { credentials: 'include' });
-  if (!res.ok) throw new Error(res.status === 403 ? 'Result not released yet' : res.status === 404 ? 'Not found' : `Request failed (${res.status})`);
-  return res.json() as Promise<T>;
+  try {
+    return await api<T>(path);
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 403) throw new Error('Result not released yet');
+    if (e instanceof ApiError && e.status === 404) throw new Error('Not found');
+    throw e;
+  }
 }
 
 export const useResult = (attemptId: string) =>
@@ -40,4 +44,4 @@ export const useLeaderboard = (testId: string, scope: 'test' | 'batch' = 'test',
     queryFn: () => get<{ label: string; rows: LeaderboardRow[] }>(`/tests/${testId}/leaderboard?scope=${scope}${scopeId ? `&scopeId=${scopeId}` : ''}`),
   });
 
-export const reportUrl = (attemptId: string) => `${BASE}/api/v1/results/${attemptId}/report.pdf`;
+export const reportUrl = (attemptId: string) => `${process.env.NEXT_PUBLIC_API_URL ?? ''}/api/v1/results/${attemptId}/report.pdf`;

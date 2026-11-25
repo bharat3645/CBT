@@ -9,7 +9,7 @@ import { AbilityProvider } from "@/lib/casl";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useDashboard } from "@/features/dashboards/api";
 import { useSelectedChild } from "@/features/parent/child";
-import { NotificationsMenu } from "@/features/notifications/NotificationsMenu";
+import { NotificationsMenu } from "@/features/notifications/notifications-menu";
 import { navByRole, roleSlugToRole, withBadges, type RoleSlug } from "./nav-config";
 
 const NextLink = ({ href, children, ...rest }: LinkProps) => (

@@ -172,5 +172,3 @@ export function withBadges(groups: NavGroup[], badges: Partial<DashboardBadges> 
   return groups.map((g) => ({ ...g, items: g.items.map(apply) }));
 }
 
-// referenced so unused-icon lint stays quiet if a role drops one
-export const _icons = { Plus, UserRound };

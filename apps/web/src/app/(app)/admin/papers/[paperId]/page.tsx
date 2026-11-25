@@ -1,4 +1,4 @@
-import { PaperReviewPage } from "@/features/mounts/paper-pages";
+import { PaperReviewPage } from "@/features/route-pages/paper-pages";
 
 export default async function Page({ params }: { params: Promise<{ paperId: string }> }) {
   const { paperId } = await params;

@@ -14,7 +14,7 @@ import {
   validateDraft,
   type QuestionDraft,
 } from '../lib/draft';
-import { RichTextEditor } from './RichTextEditor';
+import { RichTextEditor } from './rich-text-editor';
 
 const TYPE_LABEL: Record<string, string> = {
   mcq_single: 'MCQ (single correct)',

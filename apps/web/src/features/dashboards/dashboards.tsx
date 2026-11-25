@@ -9,7 +9,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle } from "@cbt/ui";
 import { Bar, ListCard, PageHeader, StatGrid, Status } from "@/components/dashboard-kit";
 import { EmptyState, ErrorNote, Loading, fmtDateTime, fmtPct } from "@/components/ui-kit";
 import { useSelectedChild } from "@/features/parent/child";
-import { AttendanceSummaryView } from "@/features/phase2/Phase2Pages";
+import { AttendanceSummaryView } from "@/features/attendance/attendance-pages";
 import { useDashboard } from "./api";
 
 const firstName = (full: string) => full.trim().split(/\s+/)[0] || full;
