@@ -3,7 +3,7 @@ import { and, desc, eq, gte, inArray, isNull, lte, or, sql, type SQL } from "dri
 import { createHash } from "node:crypto";
 import {
   DEFAULT_PRESETS, computeDeadline, remainingMs, isExpired, SUBMIT_GRACE_MS,
-  type CreateTestInput, type AutosaveItem, type IncidentInput, type PresetConfig,
+  type CreateTestInput, type UpdateTestInput, type AutosaveItem, type IncidentInput, type PresetConfig,
 } from "@cbt/contracts/exams";
 import { RESULTS_JOBS, type ResultsJobs } from "../results/results.jobs";
 import { afterCommit } from "../../common/request-context";
@@ -105,7 +105,51 @@ export class ExamsService {
     }
     const [row] = await this.db.update(tests).set({ status: "published" })
       .where(and(eq(tests.id, testId), eq(tests.instituteId, actor.instituteId), eq(tests.status, "draft"))).returning();
-    if (!row) throw new ConflictException("Test not found or not in draft");
+    if (!row) {
+      await this.mustOwnTest(actor, testId); // 404 for a test this institute does not own, 409 only for a real non-draft test
+      throw new ConflictException("Test is not in draft");
+    }
+    return row;
+  }
+
+  private async mustOwnTest(actor: Actor, testId: string) {
+    const [t] = await this.db.select().from(tests)
+      .where(and(eq(tests.id, testId), eq(tests.instituteId, actor.instituteId))).limit(1);
+    if (!t) throw new NotFoundException("Test not found");
+    if (actor.role === "teacher") {
+      const scope = (t.batchIds as string[]) ?? [];
+      if (scope.some((b) => !actor.batchIds?.includes(b))) throw new ForbiddenException("You can only change tests for batches you teach");
+    }
+    return t;
+  }
+
+  /** Rename or reschedule a test that has not been cancelled. Duration cannot change after someone started an attempt. */
+  async updateTest(actor: Actor, testId: string, input: UpdateTestInput) {
+    const t = await this.mustOwnTest(actor, testId);
+    if (t.status === "closed") throw new ConflictException("A cancelled test cannot be edited");
+    const start = input.windowStart ? new Date(input.windowStart) : t.windowStart;
+    const end = input.windowEnd ? new Date(input.windowEnd) : t.windowEnd;
+    if (end <= start) throw new BadRequestException("windowEnd must be after windowStart");
+    if (input.durationMinutes !== undefined && input.durationMinutes !== t.durationMinutes) {
+      const [{ n }] = await this.db.select({ n: sql<number>`count(*)::int` }).from(attempts)
+        .where(and(eq(attempts.instituteId, actor.instituteId), eq(attempts.testId, testId)));
+      if (n > 0) throw new ConflictException("Duration cannot change after students have started this test");
+    }
+    const [row] = await this.db.update(tests).set({
+      ...(input.title !== undefined ? { title: input.title } : {}),
+      ...(input.durationMinutes !== undefined ? { durationMinutes: input.durationMinutes } : {}),
+      ...(input.instructions !== undefined ? { instructions: input.instructions } : {}),
+      windowStart: start, windowEnd: end,
+    }).where(and(eq(tests.id, testId), eq(tests.instituteId, actor.instituteId))).returning();
+    return row;
+  }
+
+  /** Cancel = status "closed": hidden from students' Upcoming, nobody can start it; existing attempts and results stay. */
+  async cancelTest(actor: Actor, testId: string) {
+    const t = await this.mustOwnTest(actor, testId);
+    if (t.status === "closed") return t;
+    const [row] = await this.db.update(tests).set({ status: "closed" })
+      .where(and(eq(tests.id, testId), eq(tests.instituteId, actor.instituteId))).returning();
     return row;
   }
 

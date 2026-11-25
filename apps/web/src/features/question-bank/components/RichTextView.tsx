@@ -16,6 +16,9 @@ function node(n: RichDoc, key: number): ReactNode {
       return <Math key={key} latex={String(n.attrs?.latex ?? '')} />;
     case 'blockMath':
       return <Math key={key} display latex={String(n.attrs?.latex ?? '')} />;
+    case 'image':
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img key={key} src={String(n.attrs?.src ?? '')} alt={String(n.attrs?.alt ?? '')} className="h-auto max-w-full rounded" />;
     case 'paragraph':
       return <p key={key}>{kids}</p>;
     case 'bulletList':

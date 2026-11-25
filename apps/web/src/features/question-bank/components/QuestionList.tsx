@@ -88,6 +88,7 @@ export function QuestionList({
         </select>
       </div>
 
+      <div className="overflow-x-auto">
       <table className="w-full text-left text-sm" aria-busy={loading}>
         <thead>
           {table.getHeaderGroups().map((hg) => (
@@ -119,6 +120,7 @@ export function QuestionList({
           )}
         </tbody>
       </table>
+      </div>
 
       <div className="flex items-center gap-2 text-sm">
         <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>

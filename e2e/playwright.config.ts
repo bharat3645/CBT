@@ -14,6 +14,7 @@ export default defineConfig({
     viewport: { width: 1440, height: 900 },
     screenshot: "off",
     trace: "retain-on-failure",
+    launchOptions: { slowMo: Number(process.env.SLOWMO ?? 0) },
   },
   outputDir: "./test-results",
 });

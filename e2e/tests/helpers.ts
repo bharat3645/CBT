@@ -26,14 +26,20 @@ export async function waitForStack(page: Page, timeoutMs = 90_000) {
 }
 
 export async function login(page: Page, role: "admin" | "teacher" | "student" | "parent") {
-  await waitForStack(page);
-  await page.context().clearCookies();
-  await page.goto("/login", { waitUntil: "networkidle" });
-  await page.fill("#email", `${role}@demo.test`);
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Log in" }).click();
-  await page.waitForTimeout(1500);
-  if (new URL(page.url()).pathname.startsWith("/login")) await shot(page, "debug-login-stuck");
-  await page.waitForURL((u) => !u.pathname.startsWith("/login"), { timeout: 20_000 });
+  // The dev API hot-reloads when files change, which can leave a sign-in request hanging: retry the form a few times.
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    await waitForStack(page);
+    await page.context().clearCookies();
+    await page.goto("/login", { waitUntil: "networkidle" });
+    await page.fill("#email", `${role}@demo.test`);
+    await page.fill("#password", PASSWORD);
+    await page.getByRole("button", { name: "Log in" }).click();
+    try {
+      await page.waitForURL((u) => !u.pathname.startsWith("/login"), { timeout: attempt === 3 ? 30_000 : 12_000 });
+      break;
+    } catch (e) {
+      if (attempt === 3) { await shot(page, "debug-login-stuck"); throw e; }
+    }
+  }
   await expect(page).not.toHaveURL(/login/);
 }

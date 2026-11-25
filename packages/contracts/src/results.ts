@@ -63,7 +63,7 @@ export const resultViewSchema = z.object({
 });
 export type ResultView = z.infer<typeof resultViewSchema>;
 
-export const leaderboardRow = z.object({ rank: z.number(), studentId: z.string(), score: z.number(), percentile: z.number().nullable() });
+export const leaderboardRow = z.object({ rank: z.number(), studentId: z.string(), name: z.string().nullable().optional(), score: z.number(), percentile: z.number().nullable() });
 export type LeaderboardRow = z.infer<typeof leaderboardRow>;
 
 /* ---------- Analytics ---------- */

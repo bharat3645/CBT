@@ -7,17 +7,41 @@ from typing import Optional
 from .models import Block
 
 
+def _iter_paragraph_elements(parent):
+    """Yield w:p elements in document order, descending into tables and content controls."""
+    from .omml import W
+
+    for ch in parent:
+        tag = ch.tag if isinstance(ch.tag, str) else ""
+        if not tag.startswith("{" + W + "}"):
+            continue
+        local = tag.rpartition("}")[2]
+        if local == "p":
+            yield ch
+        elif local in ("tbl", "tr", "tc", "sdt", "sdtContent"):
+            yield from _iter_paragraph_elements(ch)
+
+
 def extract_docx(data: bytes) -> list[Block]:
+    """python-docx extraction. Word equations (OMML) become inline $LaTeX$ in reading order."""
     import docx  # python-docx
+    from docx.text.paragraph import Paragraph
+
+    from .omml import paragraph_text
 
     document = docx.Document(io.BytesIO(data))
     blocks: list[Block] = []
-    for p in document.paragraphs:
-        if not p.text.strip():
+    for p_el in _iter_paragraph_elements(document.element.body):
+        text = paragraph_text(p_el)
+        if not text.strip():
             continue
-        for line in p.text.split("\n"):
+        try:
+            style = Paragraph(p_el, document).style.name
+        except Exception:
+            style = None
+        for line in text.split("\n"):
             if line.strip():
-                blocks.append(Block(text=line, index=len(blocks), style=p.style.name if p.style else None))
+                blocks.append(Block(text=line, index=len(blocks), style=style))
     return blocks
 
 

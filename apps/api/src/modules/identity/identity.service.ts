@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { institutes, memberships, users, type Db, type InstituteStatus } from "@cbt/db";
 import { DB, DB_SYSTEM, SystemAccess } from "../../common/db/db.module";
@@ -67,8 +67,27 @@ export class IdentityService {
     }
   }
 
-  list(status?: string) {
-    return this.db.select().from(institutes).where(status ? eq(institutes.status, status as InstituteStatus) : undefined);
+  /** Super admin: every institute with its first admin's email and headline counts. */
+  async list(status?: string) {
+    const rows = await this.db.select().from(institutes).where(status ? eq(institutes.status, status as InstituteStatus) : undefined);
+    const stats = await this.sys.run(async (db) => {
+      const r: any = await db.execute(sql`
+        select i.id,
+          (select u.email from memberships m join users u on u.id::text = m.user_id::text where m.institute_id::text = i.id::text and m.role = 'institute_admin' order by m.created_at limit 1) as admin_email,
+          (select count(*) from memberships m where m.institute_id::text = i.id::text and m.role = 'student' and m.status = 'active')::int as students,
+          (select count(*) from memberships m where m.institute_id::text = i.id::text and m.role = 'teacher' and m.status = 'active')::int as teachers,
+          (select count(*) from batches b where b.institute_id::text = i.id::text)::int as batches,
+          (select count(*) from tests t where t.institute_id::text = i.id::text)::int as tests
+        from institutes i`);
+      return (r.rows ?? r) as Array<{ id: string; admin_email: string | null; students: number; teachers: number; batches: number; tests: number }>;
+    });
+    const by = new Map(stats.map((x) => [x.id, x]));
+    return rows
+      .map((r) => {
+        const x = by.get(r.id);
+        return { ...r, adminEmail: x?.admin_email ?? null, counts: { students: x?.students ?? 0, teachers: x?.teachers ?? 0, batches: x?.batches ?? 0, tests: x?.tests ?? 0 } };
+      })
+      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
   }
 
   async get(id: string) {

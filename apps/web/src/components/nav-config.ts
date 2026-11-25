@@ -1,15 +1,16 @@
 import {
   LayoutDashboard, GraduationCap, BookOpen, Library, FileText, ClipboardList, BarChart3, Flag, Users, UserRound, Baby,
-  LineChart, Settings, Upload, CalendarCheck, Sun, Layers, Target, Home, Dumbbell, ListChecks, MessageSquare, Plus, PlayCircle, UserPlus,
+  LineChart, Settings, Building2, Shield, Upload, CalendarCheck, Sun, Layers, Target, Home, Dumbbell, ListChecks, MessageSquare, Plus, PlayCircle, UserPlus,
 } from "lucide-react";
 import type { NavGroup, NavItem } from "@cbt/ui";
 import type { DashboardBadges } from "@cbt/contracts/dashboard";
 import type { LucideIcon } from "lucide-react";
 import type { Role } from "@/lib/casl";
 
-export type RoleSlug = "admin" | "teacher" | "student" | "parent";
+export type RoleSlug = "superadmin" | "admin" | "teacher" | "student" | "parent";
 
 export const roleSlugToRole: Record<RoleSlug, Role> = {
+  superadmin: "super_admin",
   admin: "institute_admin",
   teacher: "teacher",
   student: "student",
@@ -26,6 +27,18 @@ export type RoleNav = {
  * Menu structure only. Badge counts are NOT stored here: `withBadges` fills them from GET /api/v1/dashboard (see BADGE_BY_HREF).
  */
 export const navByRole: Record<RoleSlug, RoleNav> = {
+  superadmin: {
+    label: "Super admin",
+    groups: [
+      {
+        label: "Platform",
+        items: [
+          { title: "Overview", href: "/superadmin", icon: Shield },
+          { title: "Institutes", href: "/superadmin/institutes", icon: Building2 },
+        ],
+      },
+    ],
+  },
   admin: {
     label: "Institute admin",
     primaryAction: { label: "Add students", href: "/admin/students", icon: UserPlus },
@@ -90,6 +103,7 @@ export const navByRole: Record<RoleSlug, RoleNav> = {
         label: "Class",
         items: [
           { title: "Attendance", href: "/teacher/attendance", icon: CalendarCheck },
+          { title: "Feedback", href: "/teacher/feedback", icon: MessageSquare },
           { title: "Insights", href: "/teacher/insights", icon: LineChart },
         ],
       },

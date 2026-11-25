@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Req, BadRequestException, ForbiddenException } from "@nestjs/common";
-import { createTestInput, autosaveInput, incidentInput } from "@cbt/contracts/exams";
+import { Body, Controller, Get, Param, Patch, ParseUUIDPipe, Post, Req, BadRequestException, ForbiddenException } from "@nestjs/common";
+import { createTestInput, updateTestInput, autosaveInput, incidentInput } from "@cbt/contracts/exams";
 import { Can } from "../../common/auth/decorators";
 import { ExamsService, type Actor } from "./exams.service";
 
@@ -33,6 +33,14 @@ export class ExamsController {
   @Post("tests") @Can("create", "Test")
   create(@Req() req: any, @Body() body: unknown) {
     return this.svc.createTest(actor(req), createTestInput.parse(body));
+  }
+  @Patch("tests/:id") @Can("schedule", "Test")
+  update(@Req() req: any, @Param("id", ParseUUIDPipe) id: string, @Body() body: unknown) {
+    return this.svc.updateTest(actor(req), id, updateTestInput.parse(body));
+  }
+  @Post("tests/:id/cancel") @Can("schedule", "Test")
+  cancel(@Req() req: any, @Param("id", ParseUUIDPipe) id: string) {
+    return this.svc.cancelTest(actor(req), id);
   }
   @Post("tests/:id/publish") @Can("schedule", "Test")
   publish(@Req() req: any, @Param("id", ParseUUIDPipe) id: string) {

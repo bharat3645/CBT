@@ -7,3 +7,4 @@ export * from "./questions";
 export * from './ingestion';
 export * from './results';
 export * from './notifications';
+export * from './phase2';

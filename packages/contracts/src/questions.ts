@@ -30,7 +30,18 @@ export const optionSchema = z.object({
 });
 export type QuestionOption = z.infer<typeof optionSchema>;
 
+/** Authoring metadata shown in the question editor (all optional; kept with the version payload). */
+export const questionMetaSchema = z.object({
+  grade: z.string().max(100).optional(),
+  source: z.string().max(300).optional(),
+  author: z.string().max(200).optional(),
+  tags: z.array(z.string().max(60)).max(30).optional(),
+  learningOutcomes: z.string().max(2000).optional(),
+});
+export type QuestionMeta = z.infer<typeof questionMetaSchema>;
+
 const base = {
+  meta: questionMetaSchema.optional(),
   stem: richDocSchema,
   explanation: richDocSchema.optional(),
   difficulty: difficultySchema.default('medium'),

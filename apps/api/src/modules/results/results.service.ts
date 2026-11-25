@@ -2,6 +2,7 @@ import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nest
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { RANK_LABEL, type KeyCorrectionsInput, type ResultSettingsInput, type ResultView } from '@cbt/contracts/results';
 import { attempts, tests } from '@cbt/db/schema/exams';
+import { users } from '@cbt/db/schema/_base';
 import { answerKeyRevisions, evaluations, rankings, resultSettings } from '@cbt/db/schema/results';
 import { notifications } from '@cbt/db/schema/notifications';
 import { accuracyPct, dedupeKey, recommend } from '@cbt/marking';
@@ -85,21 +86,28 @@ export class ResultsService {
       )).orderBy(desc(evaluations.evaluatedAt));
   }
 
+  /** Staff see the whole board; a student sees only their own row (names of other students stay private). */
   async leaderboard(actor: Actor, testId: string, scope: 'test' | 'batch', scopeId?: string) {
-    requireStaff(actor);
+    if (!isStaff(actor) && actor.role !== 'student') requireStaff(actor);
     const rows = await this.db.select({
       rank: rankings.rank, studentId: rankings.studentId, percentile: rankings.percentile, score: evaluations.score,
+      name: users.name,
     }).from(rankings)
       .innerJoin(evaluations, and(eq(evaluations.attemptId, rankings.attemptId), eq(evaluations.isCurrent, true)))
+      .leftJoin(users, sql`${users.id}::text = ${rankings.studentId}`)
       .where(and(
         eq(rankings.testId, testId), eq(rankings.instituteId, actor.instituteId), eq(rankings.scope, scope),
         scopeId ? eq(rankings.scopeId, scopeId) : undefined,
+        isStaff(actor) ? undefined : and(eq(rankings.studentId, actor.id), sql`${evaluations.releasedAt} is not null`),
       )).orderBy(rankings.rank);
     return { label: RANK_LABEL, rows };
   }
 
   async setSettings(actor: Actor, testId: string, input: ResultSettingsInput) {
     requireStaff(actor);
+    const [owned] = await this.db.select({ id: tests.id }).from(tests)
+      .where(and(eq(tests.id, testId), eq(tests.instituteId, actor.instituteId)));
+    if (!owned) throw new NotFoundException('Test not found'); // never write settings for another institute's test
     const values = {
       releaseMode: input.releaseMode, releaseAt: input.releaseAt ? new Date(input.releaseAt) : null,
       tieBreakers: input.tieBreakers, minPercentileParticipants: input.minPercentileParticipants,

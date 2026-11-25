@@ -13,11 +13,12 @@ import { createContextualCan } from "@casl/react";
  * `defineAbilityFor(user)`, replace the body of `buildAbilityFor` with it and delete the stub rules.
  */
 export type AppAbility = MongoAbility<[string, string]>;
-export type Role = "institute_admin" | "teacher" | "student" | "parent";
+export type Role = "super_admin" | "institute_admin" | "teacher" | "student" | "parent";
 
 export function buildAbilityFor(role: Role | null): AppAbility {
   const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
   switch (role) {
+    case "super_admin":
     case "institute_admin":
       can("manage", "all");
       break;

@@ -104,9 +104,9 @@ export function PaperReviewEditor({ paperId }: { paperId: string }) {
         </div>
       )}
 
-      <div className="grid min-h-0 flex-1 grid-cols-2">
+      <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] md:grid-cols-2 md:grid-rows-none">
         {/* Original pane */}
-        <section className="min-h-0 overflow-auto border-r bg-neutral-100" aria-label="Original document">
+        <section className="max-h-40 min-h-0 overflow-auto border-b bg-neutral-100 md:max-h-none md:border-b-0 md:border-r" aria-label="Original document">
           {paper.originalUrl && isPdf ? (
             <iframe title="Original" src={`${paper.originalUrl}#page=${page}`} className="h-full w-full" />
           ) : (

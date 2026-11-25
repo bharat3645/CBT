@@ -1,5 +1,5 @@
-import { ParentFeedbackPage } from "@/features/parent/ParentPages";
+import { ParentFeedbackPage2 } from "@/features/phase2/Phase2Pages";
 
 export default function Page() {
-  return <ParentFeedbackPage />;
+  return <ParentFeedbackPage2 />;
 }

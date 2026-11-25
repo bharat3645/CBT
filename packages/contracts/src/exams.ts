@@ -92,6 +92,16 @@ export const createTestInput = z.object({
 });
 export type CreateTestInput = z.infer<typeof createTestInput>;
 
+/** Reschedule / rename a test. Duration is locked once anyone has started an attempt. */
+export const updateTestInput = z.object({
+  title: z.string().min(1).max(200).optional(),
+  durationMinutes: z.number().int().min(1).max(600).optional(),
+  windowStart: z.string().datetime().optional(),
+  windowEnd: z.string().datetime().optional(),
+  instructions: z.string().max(10_000).nullable().optional(),
+}).refine((v) => Object.keys(v).length > 0, { message: "Nothing to update" });
+export type UpdateTestInput = z.infer<typeof updateTestInput>;
+
 export const testStatus = z.enum(["draft", "published", "closed"]);
 
 /* ---------- Attempt / autosave ---------- */

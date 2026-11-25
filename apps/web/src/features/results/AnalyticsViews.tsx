@@ -98,10 +98,10 @@ export function BatchAnalyticsView({ batchId, testId }: { batchId?: string; test
           </label>
         </div>
         {data.reteach.length === 0 ? <Empty>No weak topics.</Empty> : (
-          <table className="w-full text-sm"><thead><tr className="text-left text-xs text-muted-foreground"><th>Topic</th><th>Accuracy</th><th>Correct / attempted</th></tr></thead>
+          <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left text-xs text-muted-foreground"><th>Topic</th><th>Accuracy</th><th>Correct / attempted</th></tr></thead>
             <tbody>{data.reteach.map((t) => (
               <tr key={t.topicId} className="border-t"><td className="py-1">{t.topicName ?? t.topicId.slice(0, 8)}</td><td>{t.accuracy}%</td><td>{t.correct}/{t.attempted}</td></tr>
-            ))}</tbody></table>
+            ))}</tbody></table></div>
         )}
       </section>
       <section>
@@ -123,12 +123,14 @@ export function BatchAnalyticsView({ batchId, testId }: { batchId?: string; test
 }
 
 export function LeaderboardView({ testId, scope = 'test', scopeId }: { testId: string; scope?: 'test' | 'batch'; scopeId?: string }) {
-  const { data, isLoading } = useLeaderboard(testId, scope, scopeId);
-  if (isLoading || !data) return <p className="p-6 text-sm text-muted-foreground">Loading...</p>;
+  const { data, isLoading, isError } = useLeaderboard(testId, scope, scopeId);
+  if (isLoading) return <p className="p-6 text-sm text-muted-foreground">Loading...</p>;
+  if (isError || !data) return <p className="p-6 text-sm text-muted-foreground">The leaderboard is not available for this test yet.</p>;
+  if (!data.rows.length) return <p className="p-6 text-sm text-muted-foreground">No ranked attempts yet. Ranks appear once results are released.</p>;
   return (
     <div>
-      <table className="w-full text-sm"><thead><tr className="text-left text-xs text-muted-foreground"><th>Rank</th><th>Student</th><th>Score</th><th>Percentile</th></tr></thead>
-        <tbody>{data.rows.map((r) => <tr key={r.studentId} className="border-t"><td className="py-1">{r.rank}</td><td>{r.studentId}</td><td>{r.score}</td><td>{r.percentile ?? '-'}</td></tr>)}</tbody></table>
+      <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left text-xs text-muted-foreground"><th>Rank</th><th>Student</th><th>Score</th><th>Percentile</th></tr></thead>
+        <tbody>{data.rows.map((r) => <tr key={r.studentId} className="border-t"><td className="py-1">{r.rank}</td><td>{r.name ?? r.studentId}</td><td>{r.score}</td><td>{r.percentile ?? '-'}</td></tr>)}</tbody></table></div>
       <p className="mt-2 text-xs text-muted-foreground">{data.label}</p>
     </div>
   );

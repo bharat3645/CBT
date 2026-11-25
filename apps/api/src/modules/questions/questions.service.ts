@@ -54,8 +54,10 @@ export class QuestionsService {
     return v;
   }
 
-  versions(instituteId: string, questionId: string) {
-    return this.repo.listVersions(instituteId, questionId);
+  async versions(instituteId: string, questionId: string) {
+    const rows = await this.repo.listVersions(instituteId, questionId);
+    if (!rows.length) throw new NotFoundException('Question not found'); // every question has at least version 1
+    return rows;
   }
 
   search(instituteId: string, q: SearchQuestions) {

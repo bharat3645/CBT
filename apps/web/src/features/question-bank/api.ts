@@ -33,3 +33,22 @@ export const questionApi = {
       body: JSON.stringify({ payload, changeNote }),
     }),
 };
+
+export interface TopicChoice {
+  id: string;
+  label: string;
+}
+
+/** Topics from the syllabus tree, labelled "Subject > Chapter > Topic". */
+export async function fetchTopicChoices(): Promise<TopicChoice[]> {
+  type N = { id: string; level: string; name: string; children: N[] };
+  const tree = await http<N[]>('/syllabus/tree');
+  const out: TopicChoice[] = [];
+  const walk = (n: N, trail: string[]) => {
+    const next = n.level === 'exam' ? trail : [...trail, n.name];
+    if (n.level === 'topic') out.push({ id: n.id, label: next.slice(-3).join(' > ') });
+    n.children?.forEach((c) => walk(c, next));
+  };
+  tree.forEach((n) => walk(n, []));
+  return out;
+}

@@ -11,12 +11,14 @@ export function BuilderPage({
   actions,
   panel,
   children,
+  panelPosition = "right",
   className,
 }: {
   title: string;
   description?: string;
   actions?: React.ReactNode;
   panel?: React.ReactNode;
+  panelPosition?: "left" | "right";
   children: React.ReactNode;
   className?: string;
 }) {
@@ -29,9 +31,10 @@ export function BuilderPage({
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className={cn("grid gap-6", panelPosition === "left" ? "lg:grid-cols-[300px_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)_320px]")}>
+        {panel && panelPosition === "left" && <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">{panel}</aside>}
         <div className="min-w-0 space-y-4">{children}</div>
-        {panel && <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">{panel}</aside>}
+        {panel && panelPosition !== "left" && <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">{panel}</aside>}
       </div>
     </div>
   );

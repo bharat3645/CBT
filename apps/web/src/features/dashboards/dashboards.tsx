@@ -7,8 +7,9 @@ import type {
 } from "@cbt/contracts/dashboard";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@cbt/ui";
 import { Bar, ListCard, PageHeader, StatGrid, Status } from "@/components/dashboard-kit";
-import { EmptyState, ErrorNote, Loading, PhaseCard, fmtDateTime, fmtPct } from "@/components/ui-kit";
+import { EmptyState, ErrorNote, Loading, fmtDateTime, fmtPct } from "@/components/ui-kit";
 import { useSelectedChild } from "@/features/parent/child";
+import { AttendanceSummaryView } from "@/features/phase2/Phase2Pages";
 import { useDashboard } from "./api";
 
 const firstName = (full: string) => full.trim().split(/\s+/)[0] || full;
@@ -358,7 +359,7 @@ export function ParentDashboard() {
           { label: "Latest score", value: s.latest ? `${s.latest.score} / ${s.latest.maxScore}` : "-", hint: s.latest?.title ?? "No released result yet" },
           { label: "Average score", value: fmtPct(s.avgScorePct), hint: `${plural(s.testsAttempted, "test")} attempted` },
           { label: "Syllabus covered", value: s.syllabusPercent == null ? "-" : `${s.syllabusPercent}%`, hint: s.syllabusPercent == null ? "No syllabus set up" : "Across the child's batches" },
-          { label: "Attendance", value: "-", hint: "Coming in Phase 2" },
+          { label: "Attendance", value: "See below", hint: "Recorded by teachers" },
         ]}
       />
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -377,7 +378,8 @@ export function ParentDashboard() {
         </Card>
       </div>
       <div className="mt-6">
-        <PhaseCard title="Attendance">Class attendance tracking arrives in Phase 2. Nothing is shown here until real attendance is recorded.</PhaseCard>
+        <h2 className="mb-3 text-sm font-semibold">Attendance</h2>
+        <AttendanceSummaryView studentUserId={data.child.userId} />
       </div>
     </>
   );

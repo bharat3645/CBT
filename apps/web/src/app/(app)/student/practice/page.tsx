@@ -1,5 +1,5 @@
-import { PracticePage } from "@/features/practice/PracticePage";
+import { PracticeSetsPage } from "@/features/phase2/Phase2Pages";
 
 export default function Page() {
-  return <PracticePage />;
+  return <PracticeSetsPage />;
 }

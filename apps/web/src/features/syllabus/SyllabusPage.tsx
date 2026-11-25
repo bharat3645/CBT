@@ -26,7 +26,7 @@ const SUBTITLE: Record<Role, string> = {
 /** Role-aware syllabus: the tree comes from /syllabus/tree, progress from /syllabus/batches/:id/progress (per batch). */
 export function SyllabusPage({ role }: { role: Role }) {
   const tree = useSyllabusTree();
-  const own = useBatches();
+  const own = useBatches({ enabled: role !== "parent" }); // parents read their child's batches from /children; GET /batches is 403 for them
   const { child } = useSelectedChild(role === "parent");
   const [batchId, setBatchId] = React.useState("");
 

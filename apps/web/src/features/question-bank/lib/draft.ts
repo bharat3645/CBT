@@ -1,4 +1,4 @@
-import { questionPayloadSchema, richDocToText, type QuestionPayload, type QuestionType, type RichDoc } from '@cbt/contracts';
+import { questionPayloadSchema, richDocToText, type QuestionMeta, type QuestionPayload, type QuestionType, type RichDoc } from '@cbt/contracts';
 
 export const emptyDoc = (): RichDoc => ({ type: 'doc', content: [{ type: 'paragraph' }] });
 
@@ -16,6 +16,11 @@ export interface QuestionDraft {
   options: Array<{ id: string; content: RichDoc }>;
   correct: string[];
   numeric: { answer: number | null; tolerance: number; toleranceKind: 'absolute' | 'percent' };
+  grade: string;
+  source: string;
+  author: string;
+  tags: string[];
+  learningOutcomes: string;
 }
 
 export function emptyDraft(type: QuestionType = 'mcq_single'): QuestionDraft {
@@ -30,6 +35,11 @@ export function emptyDraft(type: QuestionType = 'mcq_single'): QuestionDraft {
     options: OPTION_IDS.slice(0, 4).map((id) => ({ id, content: emptyDoc() })),
     correct: [],
     numeric: { answer: null, tolerance: 0, toleranceKind: 'absolute' },
+    grade: '',
+    source: '',
+    author: '',
+    tags: [],
+    learningOutcomes: '',
   };
 }
 
@@ -56,8 +66,19 @@ export function removeOption(d: QuestionDraft, id: string): QuestionDraft {
   return { ...d, options: d.options.filter((o) => o.id !== id), correct: d.correct.filter((c) => c !== id) };
 }
 
+function draftMeta(d: QuestionDraft): QuestionMeta | undefined {
+  const meta: QuestionMeta = {};
+  if (d.grade.trim()) meta.grade = d.grade.trim();
+  if (d.source.trim()) meta.source = d.source.trim();
+  if (d.author.trim()) meta.author = d.author.trim();
+  if (d.tags.length) meta.tags = d.tags;
+  if (d.learningOutcomes.trim()) meta.learningOutcomes = d.learningOutcomes.trim();
+  return Object.keys(meta).length ? meta : undefined;
+}
+
 export function draftToPayload(d: QuestionDraft): unknown {
   const base = {
+    meta: draftMeta(d),
     type: d.type,
     stem: d.stem,
     explanation: richDocToText(d.explanation) ? d.explanation : undefined,
@@ -109,5 +130,10 @@ export function payloadToDraft(p: QuestionPayload): QuestionDraft {
     options: 'options' in p ? p.options : d.options,
     correct: 'correct' in p ? p.correct : [],
     numeric: p.type === 'numeric' ? p.numeric : d.numeric,
+    grade: p.meta?.grade ?? '',
+    source: p.meta?.source ?? '',
+    author: p.meta?.author ?? '',
+    tags: p.meta?.tags ?? [],
+    learningOutcomes: p.meta?.learningOutcomes ?? '',
   };
 }

@@ -1,5 +1,5 @@
-import { AttendancePhasePage } from "@/features/parent/ParentPages";
+import { ParentAttendancePage } from "@/features/phase2/Phase2Pages";
 
 export default function Page() {
-  return <AttendancePhasePage who="parent" />;
+  return <ParentAttendancePage />;
 }

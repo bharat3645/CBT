@@ -28,6 +28,7 @@ export function ExamScreen(props: {
   const [title, setTitle] = useState("");
   const [warn, setWarn] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [palOpen, setPalOpen] = useState(false);
   const sendRef = useRef<(a: string, items: AutosaveItem[]) => Promise<{ serverRemainingMs: number }>>(
     (a, items) => post(`/attempts/${a}/answers`, { items }));
 
@@ -127,14 +128,14 @@ export function ExamScreen(props: {
   const oneWay = s.config?.navigation === "one_way";
   return (
     <div className="fixed inset-0 flex flex-col bg-slate-50">
-      <TopBar title={title} candidate={props.candidate} remainingMs={remaining} sections={s.sections} activeSection={q.section}
+      <TopBar onPalette={() => setPalOpen(true)} title={title} candidate={props.candidate} remainingMs={remaining} sections={s.sections} activeSection={q.section}
         onSection={(i) => { const idx = s.questions.findIndex((x) => x.section === i); if (idx >= 0) dispatch({ type: "GOTO", index: idx, now: performance.now() }); }} />
       {warn && <div role="alert" className="bg-amber-100 px-4 py-1 text-sm text-amber-900" onClick={() => setWarn(null)}>{warn}</div>}
       {error && <div role="alert" className="bg-red-100 px-4 py-1 text-sm text-red-800" onClick={() => setError(null)}>{error}</div>}
       <div className="flex min-h-0 flex-1">
         <QuestionPane q={q} index={s.current} selected={a?.value.selected ?? []} numeric={a?.value.numeric ?? null}
           onSelect={(id) => dispatch({ type: "SELECT", optionId: id })} onNumeric={(v) => dispatch({ type: "SET_NUMERIC", value: v })} />
-        <Palette s={s} simple={s.config?.palette === "simple"} onGoto={(i) => dispatch({ type: "GOTO", index: i, now: performance.now() })} />
+        <Palette open={palOpen} onClose={() => setPalOpen(false)} s={s} simple={s.config?.palette === "simple"} onGoto={(i) => dispatch({ type: "GOTO", index: i, now: performance.now() })} />
       </div>
       <ActionBar saveState={s.saveState} showPrev={!oneWay} prevDisabled={s.current === 0}
         onPrev={() => dispatch({ type: "GOTO", index: s.current - 1, now: performance.now() })}

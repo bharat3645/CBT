@@ -38,6 +38,15 @@ export function AppShell({ role, children }: { role: RoleSlug; children: React.R
 
   React.useEffect(() => setMobileOpen(false), [pathname]);
 
+  // A signed-in user who opens another role's area (typed URL, old bookmark) is sent to their own home.
+  const actualRole = dash.data?.role as string | undefined;
+  React.useEffect(() => {
+    if (!actualRole) return;
+    const home: Record<string, RoleSlug> = { institute_admin: "admin", super_admin: "superadmin", teacher: "teacher", student: "student", parent: "parent" };
+    const mine = home[actualRole];
+    if (mine && mine !== role) router.replace(`/${mine}`);
+  }, [actualRole, role, router]);
+
   return (
     <AbilityProvider role={roleSlugToRole[role]}>
       <div className="flex min-h-screen" style={brandStyle}>
@@ -71,13 +80,7 @@ export function AppShell({ role, children }: { role: RoleSlug; children: React.R
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
               <Menu />
             </Button>
-            <div className="relative hidden max-w-sm flex-1 sm:block">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                placeholder="Search"
-                className="h-9 w-full rounded-md border border-input bg-muted/50 pl-9 pr-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
-            </div>
+            <PageSearch role={role} />
             <div className="ml-auto flex items-center gap-1">
               <span className="mr-2 hidden text-xs text-muted-foreground sm:inline">{instituteName ? `${instituteName} · ${nav.label}` : nav.label}</span>
               <NotificationsMenu unread={dash.data?.badges.unreadNotifications ?? 0} />
@@ -130,5 +133,54 @@ function ChildSwitcher() {
         </select>
       )}
     </label>
+  );
+}
+
+/** Header search: jump to any page of this role's menu by typing part of its name (Enter opens the first match). */
+function PageSearch({ role }: { role: RoleSlug }) {
+  const router = useRouter();
+  const [q, setQ] = React.useState("");
+  const [open, setOpen] = React.useState(false);
+  const flat = React.useMemo(() => {
+    const out: { title: string; href: string }[] = [];
+    const walk = (items: import("@cbt/ui").NavItem[], prefix = "") => {
+      for (const i of items) {
+        if (i.href) out.push({ title: prefix + i.title, href: i.href });
+        if (i.children) walk(i.children, `${i.title} / `);
+      }
+    };
+    navByRole[role].groups.forEach((g) => walk(g.items));
+    return out;
+  }, [role]);
+  const term = q.trim().toLowerCase();
+  const matches = term ? flat.filter((i) => i.title.toLowerCase().includes(term)).slice(0, 6) : [];
+  const go = (href: string) => { setQ(""); setOpen(false); router.push(href); };
+  return (
+    <div className="relative hidden max-w-sm flex-1 sm:block">
+      <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <input
+        aria-label="Search pages"
+        placeholder="Search pages"
+        value={q}
+        onChange={(e) => { setQ(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onKeyDown={(e) => { if (e.key === "Enter" && matches[0]) go(matches[0].href); if (e.key === "Escape") setOpen(false); }}
+        className="h-9 w-full rounded-md border border-input bg-muted/50 pl-9 pr-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+      {open && term && (
+        <ul role="listbox" aria-label="Matching pages" className="absolute left-0 right-0 top-10 z-30 rounded-lg border border-border bg-card p-1 shadow-lg">
+          {matches.length === 0 ? (
+            <li className="px-3 py-2 text-sm text-muted-foreground">No matching page</li>
+          ) : (
+            matches.map((m) => (
+              <li key={m.href} role="option" aria-selected="false">
+                <button type="button" className="w-full rounded px-3 py-2 text-left text-sm hover:bg-muted" onMouseDown={(e) => { e.preventDefault(); go(m.href); }}>{m.title}</button>
+              </li>
+            ))
+          )}
+        </ul>
+      )}
+    </div>
   );
 }

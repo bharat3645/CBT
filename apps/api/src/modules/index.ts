@@ -9,6 +9,7 @@ import { ResultsModule } from "./results/results.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { DashboardModule } from "./dashboard/dashboard.module";
+import { Phase2Module } from "./phase2/phase2.module";
 // Other agents: import your module above and append it to FEATURE_MODULES below (one line each).
 // Your module can inject: DB / DB_SYSTEM (common/db/db.module), Notifier, StorageService, PdfService, QueueService,
 // AuditService, AUTH, and use @Can()/@Public()/@Ctx() from common/auth/decorators.
@@ -24,4 +25,5 @@ export const FEATURE_MODULES: Type<unknown>[] = [
   NotificationsModule,
   AnalyticsModule,
   DashboardModule,
+  Phase2Module,
 ];

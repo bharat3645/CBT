@@ -55,7 +55,7 @@ export function usePeople(p: { role?: PersonRole; q?: string; batchId?: string; 
   });
 }
 
-export const useBatches = () => useQuery({ queryKey: ["batches"], queryFn: () => api<BatchRow[]>("/batches") });
+export const useBatches = (opts: { enabled?: boolean } = {}) => useQuery({ queryKey: ["batches"], queryFn: () => api<BatchRow[]>("/batches"), enabled: opts.enabled ?? true });
 
 export const useGuardianLinks = (guardianId?: string) =>
   useQuery({ queryKey: ["guardian-links", guardianId ?? "all"], queryFn: () => api<GuardianLink[]>("/guardian-links", { query: { guardianId } }) });

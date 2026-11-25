@@ -8,9 +8,9 @@ export function BatchInsightsPage({ title = "Insights" }: { title?: string }) {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-      <div className="flex gap-2 text-sm">
-        <input aria-label="Batch id" placeholder="Batch id" className="rounded border p-1" value={batchId} onChange={(e) => setBatchId(e.target.value.trim())} />
-        <input aria-label="Test id" placeholder="Test id" className="rounded border p-1" value={testId} onChange={(e) => setTestId(e.target.value.trim())} />
+      <div className="flex flex-wrap gap-2 text-sm">
+        <input aria-label="Batch id" placeholder="Batch id" className="min-w-0 max-w-full rounded border p-1" value={batchId} onChange={(e) => setBatchId(e.target.value.trim())} />
+        <input aria-label="Test id" placeholder="Test id" className="min-w-0 max-w-full rounded border p-1" value={testId} onChange={(e) => setTestId(e.target.value.trim())} />
       </div>
       <BatchAnalyticsView batchId={batchId || undefined} testId={testId || undefined} />
     </div>

@@ -5,3 +5,4 @@ export * from "./components/card";
 export * from "./components/status";
 export * from "./components/builder-page";
 export * from "./components/sidebar";
+export * from "./components/select";

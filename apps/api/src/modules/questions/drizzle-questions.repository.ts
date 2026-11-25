@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { questions, questionTopics, questionVersions } from '@cbt/db';
@@ -26,8 +26,18 @@ export class DrizzleQuestionRepository implements QuestionRepository {
     return nextQuestionCode(rows.map((r) => r.code));
   }
 
+  /** Topic links must point at a syllabus node this institute can see (its own, or a global template). */
+  private async assertTopics(tx: { execute: (q: any) => Promise<any> }, instituteId: string, topicIds: string[]) {
+    const ids = [...new Set(topicIds)];
+    if (!ids.length) return;
+    const res: any = await tx.execute(sql`SELECT count(*)::int AS n FROM syllabus_nodes
+      WHERE id IN (${sql.join(ids.map((i) => sql`${i}::uuid`), sql`, `)}) AND (institute_id = ${instituteId}::uuid OR institute_id IS NULL)`);
+    if (((res.rows ?? res)[0]?.n ?? 0) !== ids.length) throw new BadRequestException('Unknown topic');
+  }
+
   insert(a: { instituteId: string; userId: string | null; code: string; payload: QuestionPayload; searchText: string }) {
     return this.db.transaction(async (tx) => {
+      await this.assertTopics(tx, a.instituteId, a.payload.topicIds);
       const [q] = await tx
         .insert(questions)
         .values({
@@ -69,6 +79,7 @@ export class DrizzleQuestionRepository implements QuestionRepository {
         .where(and(eq(questions.id, a.questionId), eq(questions.instituteId, a.instituteId)))
         .for('update');
       if (!cur) return null;
+      await this.assertTopics(tx, a.instituteId, a.payload.topicIds);
       const version = cur.v + 1;
       await tx.insert(questionVersions).values({
         instituteId: a.instituteId,

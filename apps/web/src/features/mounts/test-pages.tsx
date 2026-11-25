@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { buttonVariants, Card } from "@cbt/ui";
+import { Button, buttonVariants, Card, Input } from "@cbt/ui";
 import { paperApi } from "@/features/paper-review";
 import { TestWizard, type WizardBatch, type WizardPaper } from "@/features/cbt/components/test-wizard";
 import { api } from "@/lib/api-client";
@@ -93,11 +93,14 @@ export function TestsPage() {
                   <tr key={t.id} data-testid="test-row">
                     <td className="p-2 font-medium">{t.title}<div className="text-xs font-normal text-muted-foreground">{t.questionCount} questions, {t.durationMinutes} min</div></td>
                     <td className="p-2">{t.batches.length ? t.batches.map((b) => b.name).join(", ") : "Whole institute"}</td>
-                    <td className="p-2">{t.status === "published" ? STATE_LABEL[t.windowState] : t.status}</td>
+                    <td className="p-2">{t.status === "published" ? STATE_LABEL[t.windowState] : t.status === "closed" ? "Cancelled" : t.status}</td>
                     <td className="p-2 whitespace-nowrap">{fmt(t.windowStart)}<br />{fmt(t.windowEnd)}</td>
                     <td className="p-2">{t.presetName}</td>
                     <td className="p-2 text-right">{t.submittedCount} / {t.attemptCount}</td>
-                    <td className="p-2 text-right"><Link className="text-primary underline" href={`${base}/${t.id}/leaderboard`}>Leaderboard</Link></td>
+                    <td className="p-2 text-right whitespace-nowrap">
+                      <Link className="text-primary underline" href={`${base}/${t.id}/leaderboard`}>Leaderboard</Link>
+                      {t.status !== "closed" && <TestRowActions t={t} onChanged={() => void qc.invalidateQueries({ queryKey: ["tests"] })} />}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -105,6 +108,65 @@ export function TestsPage() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+const toLocalInput = (iso: string) => {
+  const d = new Date(iso);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+};
+
+/** Edit (title / window) and cancel for one test row. Cancelling hides it from students; results already earned stay. */
+function TestRowActions({ t, onChanged }: { t: StaffTest; onChanged: () => void }) {
+  const [mode, setMode] = useState<"idle" | "edit" | "cancel">("idle");
+  const [title, setTitle] = useState(t.title);
+  const [start, setStart] = useState(toLocalInput(t.windowStart));
+  const [end, setEnd] = useState(toLocalInput(t.windowEnd));
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  async function run(fn: () => Promise<unknown>, ok: string) {
+    setBusy(true); setMsg(null);
+    try { await fn(); setMode("idle"); onChanged(); setMsg(ok); }
+    catch (e) { setMsg(e instanceof Error ? e.message : "Something went wrong"); }
+    finally { setBusy(false); }
+  }
+  return (
+    <div className="mt-2 space-y-2 text-left">
+      {mode === "idle" && (
+        <div className="flex justify-end gap-2">
+          <Button size="sm" variant="outline" onClick={() => setMode("edit")}>Edit</Button>
+          <Button size="sm" variant="outline" onClick={() => setMode("cancel")}>Cancel test</Button>
+        </div>
+      )}
+      {mode === "edit" && (
+        <form
+          className="space-y-2 rounded border p-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void run(() => api(`/tests/${t.id}`, { method: "PATCH", body: { title, windowStart: new Date(start).toISOString(), windowEnd: new Date(end).toISOString() } }), "Test updated.");
+          }}
+        >
+          <label className="block text-xs">Title<Input aria-label={`Title for ${t.title}`} value={title} onChange={(e) => setTitle(e.target.value)} required /></label>
+          <label className="block text-xs">Opens<Input aria-label="Window start" type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} required /></label>
+          <label className="block text-xs">Closes<Input aria-label="Window end" type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} required /></label>
+          <div className="flex gap-2">
+            <Button size="sm" type="submit" disabled={busy}>Save test</Button>
+            <Button size="sm" type="button" variant="ghost" onClick={() => setMode("idle")}>Close</Button>
+          </div>
+        </form>
+      )}
+      {mode === "cancel" && (
+        <div className="space-y-2 rounded border p-2 text-xs">
+          <p>Cancel &quot;{t.title}&quot;? Students will no longer see or start it. Submitted attempts and results are kept.</p>
+          <div className="flex gap-2">
+            <Button size="sm" variant="destructive" disabled={busy} onClick={() => void run(() => api(`/tests/${t.id}/cancel`, { method: "POST" }), "Test cancelled.")}>Yes, cancel test</Button>
+            <Button size="sm" variant="ghost" onClick={() => setMode("idle")}>Keep test</Button>
+          </div>
+        </div>
+      )}
+      {msg && <p role="status" className="text-xs text-muted-foreground">{msg}</p>}
     </div>
   );
 }

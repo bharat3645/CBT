@@ -4,9 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input, Label } from "@cbt/ui";
-import { signIn, signUp } from "@/lib/auth-client";
+import { signIn } from "@/lib/auth-client";
 
-const homeFor: Record<string, string> = { super_admin: "/admin", institute_admin: "/admin", admin: "/admin", teacher: "/teacher", student: "/student", parent: "/parent" };
+const homeFor: Record<string, string> = { super_admin: "/superadmin", institute_admin: "/admin", admin: "/admin", teacher: "/teacher", student: "/student", parent: "/parent" };
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
@@ -14,6 +14,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const isSignup = mode === "signup";
+  const [registered, setRegistered] = React.useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -23,9 +24,22 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     const email = String(fd.get("email"));
     const password = String(fd.get("password"));
     try {
-      const res = isSignup
-        ? await signUp.email({ email, password, name: String(fd.get("name")) })
-        : await signIn.email({ email, password });
+      if (isSignup) {
+        // Institute registration (FR-001): creates the admin account and a PENDING institute; the platform owner approves it.
+        const r = await fetch("/api/v1/institutes", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: String(fd.get("institute")), adminName: String(fd.get("name")), adminEmail: email, password }),
+        });
+        if (!r.ok) {
+          const body = (await r.json().catch(() => null)) as { message?: string | string[] } | null;
+          setError(r.status === 429 ? "Too many attempts. Please wait a minute and try again." : (Array.isArray(body?.message) ? body?.message[0] : body?.message) ?? "Could not register the institute");
+          return;
+        }
+        setRegistered(String(fd.get("institute")));
+        return;
+      }
+      const res = await signIn.email({ email, password });
       if (res.error) {
         setError(res.error.message ?? "Something went wrong");
         return;
@@ -46,6 +60,20 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }
   }
 
+  if (registered) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6" role="status">
+          <h1 className="text-lg font-semibold">Registration received</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {registered} is waiting for approval. You can log in once the platform team approves your institute.
+          </p>
+          <Link href="/login" className="mt-4 inline-block text-sm font-medium text-accent-foreground hover:underline">Back to log in</Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
@@ -60,10 +88,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           </p>
           <form onSubmit={onSubmit} className="space-y-4">
             {isSignup && (
-              <div className="space-y-1.5">
-                <Label htmlFor="name">Full name</Label>
-                <Input id="name" name="name" required autoComplete="name" />
-              </div>
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="institute">Institute name</Label>
+                  <Input id="institute" name="institute" required minLength={2} autoComplete="organization" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="name">Your full name</Label>
+                  <Input id="name" name="name" required minLength={2} autoComplete="name" />
+                </div>
+              </>
             )}
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
