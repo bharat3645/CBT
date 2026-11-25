@@ -4,7 +4,7 @@ A multi-tenant computer-based-test (CBT) platform for entrance-exam coaching ins
 Teachers upload a Word/PDF question paper, review the auto-segmented questions, publish a timed test to batches,
 students sit it in an NTA-style exam screen, and results, ranks, attendance, feedback and PDF reports follow automatically.
 
-- **Hosted demo (no install):** see [Hosted demo](#hosted-demo). It runs entirely in the browser on recorded sample data.
+- **Hosted demo (no install): <https://prepdesk-demo.vercel.app>**. Click a role on the login page. It runs entirely in the browser on recorded sample data; see [Hosted demo](#hosted-demo).
 - **Run it locally:** see [Quick start](#quick-start), about 10 minutes, full real stack.
 
 ## Demo accounts
@@ -33,10 +33,11 @@ Deploy your own copy to Vercel (needs only the Vercel CLI and an account):
 
 ```bash
 npx vercel login
-npx vercel --prod          # run from the repo root; vercel.json sets the build (NEXT_PUBLIC_DEMO=1) and output
+npx vercel --prod          # run from the repo root. One-time project settings: Root Directory apps/web,
+                           # env NEXT_PUBLIC_DEMO=1 and AUTH_REQUIRED=1 (vercel.json build.env is NOT honoured)
 ```
 
-or import the repo in the Vercel dashboard with the repo root as the project root; `vercel.json` supplies the install and build commands.
+or import the repo in the Vercel dashboard with Root Directory `apps/web` and those two environment variables; `apps/web/vercel.json` supplies the install command.
 
 Refresh the recording after changing seed data or API responses:
 
