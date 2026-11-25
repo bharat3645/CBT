@@ -32,7 +32,7 @@ function PracticeCard({ q, index, onDone }: { q: PQ; index: number; onDone: (ok:
         <div className="mt-3 space-y-2">
           {q.options.map((o) => {
             const correctIds = Array.isArray(done?.correctAnswer) ? (done!.correctAnswer as string[]) : [];
-            const mark = done ? (correctIds.includes(o.id) ? "border-green-600 bg-green-50 dark:bg-green-950" : sel.includes(o.id) ? "border-red-500 bg-red-50 dark:bg-red-950" : "border-border") : sel.includes(o.id) ? "border-primary bg-muted" : "border-border hover:bg-muted";
+            const mark = done ? (correctIds.includes(o.id) ? "border-success bg-success/10 " : sel.includes(o.id) ? "border-destructive bg-destructive/10 " : "border-border") : sel.includes(o.id) ? "border-primary bg-muted" : "border-border hover:bg-muted";
             return (
               <button key={o.id} type="button" disabled={!!done} aria-pressed={sel.includes(o.id)} onClick={() => setSel((s) => (q.multi ? (s.includes(o.id) ? s.filter((x) => x !== o.id) : [...s, o.id]) : [o.id]))} className={`flex w-full items-start gap-3 rounded-md border px-3 py-2 text-left text-sm ${mark}`}>
                 <span className="font-semibold">{o.id}.</span>
@@ -128,7 +128,7 @@ export function PracticeSetsPage() {
         ) : (
           <>
             <div className="text-sm text-muted-foreground" data-testid="practice-score">
-              {answered} of {set.data.length} answered · {right} correct
+              {answered} of {set.data.length} answered, {right} correct
             </div>
             {set.data.map((q, i) => (
               <PracticeCard

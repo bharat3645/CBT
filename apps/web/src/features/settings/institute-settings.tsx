@@ -46,7 +46,7 @@ export function InstituteSettings() {
   if (inst.error || !inst.data) return <ErrorNote error={inst.error ?? new Error("Could not load the institute")} />;
   const i = inst.data;
   const colorOk = !form.brandColor || HEX.test(form.brandColor);
-  const preview = HEX.test(form.brandColor) ? form.brandColor : "#3b5bfd";
+  const preview = HEX.test(form.brandColor) ? form.brandColor : "#c2543b";
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -70,10 +70,10 @@ export function InstituteSettings() {
               <input type="email" className={inputCls} value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Brand colour" hint={colorOk ? "Used for buttons and highlights. Leave empty for the default." : "Use a 6 digit hex colour such as #3b5bfd."}>
+              <Field label="Brand colour" hint={colorOk ? "Used for buttons and highlights. Leave empty for the default." : "Use a 6 digit hex colour such as #c2543b."}>
                 <div className="flex items-center gap-2">
                   <input aria-label="Pick brand colour" type="color" value={preview} onChange={(e) => setForm({ ...form, brandColor: e.target.value })} className="h-9 w-12 cursor-pointer rounded-md border border-input bg-card p-1" />
-                  <input aria-label="Brand colour" className={inputCls} placeholder="#3b5bfd" value={form.brandColor} onChange={(e) => setForm({ ...form, brandColor: e.target.value })} />
+                  <input aria-label="Brand colour" className={inputCls} placeholder="#c2543b" value={form.brandColor} onChange={(e) => setForm({ ...form, brandColor: e.target.value })} />
                 </div>
               </Field>
               <Field label="Logo URL" hint="A link to a square image (PNG, JPG, SVG).">
@@ -93,7 +93,7 @@ export function InstituteSettings() {
             <div className="flex items-center gap-3 rounded-md bg-sidebar p-3 text-sidebar-foreground">
               {form.logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={form.logo} alt="" className="size-8 rounded-md bg-white object-contain" />
+                <img src={form.logo} alt="" className="size-8 rounded-md bg-card object-contain" />
               ) : (
                 <span className="flex size-8 items-center justify-center rounded-md text-sm font-bold text-white" style={{ background: preview }}>
                   {(form.name || "I").slice(0, 1).toUpperCase()}

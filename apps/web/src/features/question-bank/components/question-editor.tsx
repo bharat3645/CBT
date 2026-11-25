@@ -63,9 +63,9 @@ function Chips({ items, onRemove, label }: { items: Array<{ id: string; text: st
   return (
     <ul className="flex flex-wrap gap-1.5" aria-label={label}>
       {items.map((c) => (
-        <li key={c.id} className="inline-flex max-w-full items-center gap-1 rounded-full bg-primary/10 py-0.5 pl-2.5 pr-1 text-xs text-primary">
+        <li key={c.id} className="inline-flex max-w-full items-center gap-1 rounded-full bg-accent py-0.5 pl-2.5 pr-1 text-xs text-accent-foreground">
           <span className="truncate">{c.text}</span>
-          <button type="button" aria-label={`Remove ${c.text}`} onClick={() => onRemove(c.id)} className="rounded-full p-0.5 hover:bg-primary/20">
+          <button type="button" aria-label={`Remove ${c.text}`} onClick={() => onRemove(c.id)} className="rounded-full p-0.5 hover:bg-primary/10">
             <X className="size-3" />
           </button>
         </li>
@@ -249,7 +249,7 @@ export function QuestionEditor({
                           onChange={() => setDraft(toggleCorrect(draft, o.id))}
                         />
                         Choice {o.id}
-                        {correct && <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs font-normal text-primary">Correct</span>}
+                        {correct && <span className="rounded bg-accent px-1.5 py-0.5 text-xs font-medium text-accent-foreground">Correct</span>}
                       </label>
                       <Button
                         type="button"

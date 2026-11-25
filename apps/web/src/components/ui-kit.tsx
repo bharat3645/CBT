@@ -59,7 +59,7 @@ export function Pill({ tone = "neutral", children }: { tone?: "neutral" | "good"
   const tones = {
     neutral: "bg-muted text-muted-foreground",
     good: "bg-exam-answered/10 text-exam-answered",
-    warn: "bg-exam-flagged/15 text-amber-700",
+    warn: "bg-exam-flagged/15 text-foreground",
     bad: "bg-destructive/10 text-destructive",
   };
   return <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", tones[tone])}>{children}</span>;

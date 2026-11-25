@@ -6,7 +6,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       </div>
       {actions && <div className="flex gap-2">{actions}</div>}
@@ -18,9 +18,9 @@ export function StatGrid({ stats }: { stats: { label: string; value: string; hin
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((s) => (
-        <Card key={s.label} className="p-4">
+        <Card key={s.label} className="p-5">
           <div className="text-xs text-muted-foreground">{s.label}</div>
-          <div className="mt-1 text-2xl font-semibold tracking-tight">{s.value}</div>
+          <div className="mt-1 text-3xl font-semibold tabular-nums tracking-tight">{s.value}</div>
           {s.hint && <div className="mt-1 text-xs text-muted-foreground">{s.hint}</div>}
         </Card>
       ))}

@@ -1,150 +1,129 @@
 import Link from "next/link";
-import { ArrowRight, BarChart3, CalendarCheck, FileUp, GraduationCap, MessageSquare, MonitorCheck, ShieldCheck, Timer, Trophy, Users } from "lucide-react";
 import { Button } from "@cbt/ui";
 import { IS_DEMO } from "@/lib/demo/flag";
+import { PaperDesk, Wordmark } from "@/components/stationery";
+import { RoleSwitcher } from "@/features/landing/role-switcher";
 
-const features = [
-  { icon: FileUp, title: "Paper to CBT in minutes", body: "Upload a Word or PDF paper. Questions, options, maths and the answer key are extracted, doubtful ones are flagged, and you approve a clean paper." },
-  { icon: MonitorCheck, title: "Exam-grade test screen", body: "Server-driven timer, five-state question palette, autosave with offline tolerance and strict-mode incident logging." },
-  { icon: Trophy, title: "Marks, ranks, percentiles", body: "NTA-style +4/-1 marking, section scores and topic analysis. Batch and test ranks appear the moment a test closes." },
-  { icon: BarChart3, title: "Analytics that teach", body: "Weak-topic detection per student, batch comparison, question-level accuracy and exportable reports." },
-  { icon: CalendarCheck, title: "Attendance and feedback", body: "Teachers mark attendance in a tap; parents are alerted to absences and read written feedback on their child." },
-  { icon: ShieldCheck, title: "Isolated per institute", body: "Postgres row-level security on every table, an insert-only audit trail and a test suite that attacks every endpoint cross-tenant." },
+const primary = IS_DEMO ? { href: "/login", label: "Try the live demo" } : { href: "/signup", label: "Start your institute" };
+
+const examFacts = [
+  ["Server timer", "The clock lives on the server, so a refresh or a second tab cannot buy time."],
+  ["Autosave offline", "Answers queue in the browser and sync the moment the connection returns."],
+  ["Strict mode", "Leaving full screen is logged as an incident the teacher can review."],
 ];
 
-const roles = [
-  { icon: Users, name: "Institute admin", body: "Batches, people, papers, flags, reports and branding in one workspace." },
-  { icon: GraduationCap, name: "Teacher", body: "Upload papers, build tests, mark attendance, write feedback, watch insights." },
-  { icon: Timer, name: "Student", body: "Sit live exams, see rank and weak topics, practise by topic with instant explanations." },
-  { icon: MessageSquare, name: "Parent", body: "Follow results, attendance and teacher feedback for each linked child." },
+const sealed = [
+  ["Row-level security", "Every tenant table is filtered by the database itself, not by application code."],
+  ["Insert-only audit log", "Changes are recorded by triggers that nobody can edit or delete."],
+  ["Attacked in every build", "A test calls every endpoint as another institute and expects to be refused."],
 ];
 
-const steps = [
-  ["Upload", "Drop in a DOCX or PDF paper. It is virus-scanned and stored untouched."],
-  ["Review", "Side-by-side editor shows every extracted question next to the source page, with confidence and flags."],
-  ["Publish", "Pick a preset (NTA, private-university MCQ, practice), assign batches and a window."],
-  ["Learn", "Results, ranks and weak topics reach students and parents automatically."],
-];
-
+/** Public landing page. Server component; only the role switcher is interactive. */
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-sm">P</span>
-            PrepDesk
-          </Link>
-          <nav className="flex items-center gap-2">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-40 border-b border-border bg-background">
+        <div className="wrap flex h-16 items-center justify-between">
+          <Wordmark />
+          <nav aria-label="Main" className="flex items-center gap-2">
             <Button variant="ghost" asChild>
               <Link href="/login">Log in</Link>
             </Button>
             <Button asChild>
-              <Link href={IS_DEMO ? "/login" : "/signup"}>{IS_DEMO ? "Try the demo" : "Get started"}</Link>
+              <Link href={primary.href}>{IS_DEMO ? "Try the demo" : "Get started"}</Link>
             </Button>
           </nav>
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-sidebar text-sidebar-foreground">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_80%_0%,rgba(59,91,253,0.35),transparent),radial-gradient(40%_50%_at_0%_100%,rgba(124,58,237,0.25),transparent)]" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:py-24 lg:grid-cols-[1.05fr_1fr]">
+      <main>
+        <section className="wrap grid items-center gap-10 pb-16 pt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-8 lg:pt-16">
           <div>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-sidebar-border bg-sidebar-accent/50 px-3 py-1 text-xs text-sidebar-muted">
-              <span className="size-1.5 rounded-full bg-exam-answered" /> Built for entrance-exam coaching institutes
-            </p>
-            <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Run exam prep like the real exam.</h1>
-            <p className="mt-4 max-w-xl text-base text-sidebar-muted">
-              Turn question papers into computer-based tests, run them at scale, and give every student, teacher and parent a clear view of progress.
-            </p>
+            <h1 className="display max-w-[11ch]">Paper in. Ranks out.</h1>
+            <p className="lead mt-6 max-w-[30ch] text-muted-foreground">Turn a question paper into a timed test and ranked results.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button size="lg" asChild>
-                <Link href={IS_DEMO ? "/login" : "/signup"}>
-                  {IS_DEMO ? "Explore the live demo" : "Start your institute"} <ArrowRight className="ml-1 size-4" />
-                </Link>
+                <Link href={primary.href}>{primary.label}</Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent" asChild>
+              <Button size="lg" variant="outline" asChild>
                 <Link href="/login">Log in</Link>
               </Button>
             </div>
-            <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 text-sm">
-              {[["60", "question bank"], ["47", "graded attempts"], ["4", "role workspaces"]].map(([n, l]) => (
-                <div key={l}>
-                  <dt className="text-2xl font-semibold text-white">{n}</dt>
-                  <dd className="text-sidebar-muted">{l}</dd>
+          </div>
+          <PaperDesk className="shadow-[var(--edge-stock)]" />
+        </section>
+
+        <section className="wrap grid items-center gap-10 py-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28">
+          <div>
+            <h2 className="section-title max-w-[14ch]">Check every question before it goes live.</h2>
+            <p className="mt-5 max-w-[42ch] text-base text-muted-foreground">
+              Each question sits beside its source page with a confidence mark. A paper with an open flag or a missing answer key cannot be approved.
+            </p>
+          </div>
+          <figure className="stock-tex p-2 sm:p-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/landing/review.png" width={1440} height={900} alt="The paper review editor: the source page on the left, the extracted question and its flags on the right" className="w-full rounded-md" />
+          </figure>
+        </section>
+
+        <section className="border-y border-border bg-muted/60">
+          <div className="wrap grid items-start gap-10 py-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28">
+            <div>
+              <h2 className="section-title max-w-[12ch]">One workspace for each person.</h2>
+              <p className="mt-5 max-w-[38ch] text-base text-muted-foreground">Pick a role to see what it gets. Each one is a login on the live demo.</p>
+            </div>
+            <RoleSwitcher />
+          </div>
+        </section>
+
+        <section className="wrap grid items-center gap-10 py-20 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14 lg:py-28">
+          <figure className="stock-tex order-last p-2 sm:p-3 lg:order-first">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/landing/exam.png" width={1440} height={900} alt="The live exam screen with the question, the answer options and the question palette" className="w-full rounded-md" />
+          </figure>
+          <div>
+            <h2 className="section-title max-w-[13ch]">A test screen that behaves like the real one.</h2>
+            <dl className="mt-8 divide-y divide-border border-y border-border">
+              {examFacts.map(([t, b]) => (
+                <div key={t} className="py-4">
+                  <dt className="font-semibold">{t}</dt>
+                  <dd className="mt-1 text-base text-muted-foreground">{b}</dd>
                 </div>
               ))}
             </dl>
           </div>
-          <div className="relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/landing/admin.png" alt="PrepDesk admin dashboard" className="w-full rounded-xl border border-sidebar-border shadow-2xl shadow-black/40" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/landing/exam.png" alt="Live exam screen with question palette" className="absolute -bottom-6 -left-4 hidden w-2/5 rounded-lg border border-sidebar-border shadow-xl shadow-black/50 md:block" />
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-20">
-        <h2 className="text-2xl font-semibold tracking-tight">Everything an institute needs, nothing it doesn&apos;t</h2>
-        <p className="mt-2 max-w-2xl text-muted-foreground">Four differentiators are built by hand: the paper segmenter, the conversion review editor, the CBT engine, and evaluation with ranking.</p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => (
-            <div key={f.title} className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-md">
-              <span className="mb-3 flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                <f.icon className="size-5" />
-              </span>
-              <h3 className="font-medium">{f.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{f.body}</p>
+        <section className="board">
+          <div className="wrap grid items-start gap-10 py-20 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-14 lg:py-28">
+            <div>
+              <h2 className="section-title max-w-[14ch]">Every institute is sealed off.</h2>
+              <dl className="mt-8 divide-y divide-sidebar-border border-y border-sidebar-border">
+                {sealed.map(([t, b]) => (
+                  <div key={t} className="py-4">
+                    <dt className="font-semibold">{t}</dt>
+                    <dd className="mt-1 text-base text-sidebar-muted">{b}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-border bg-card">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <h2 className="text-2xl font-semibold tracking-tight">From paper to progress report</h2>
-          <ol className="mt-8 grid gap-6 md:grid-cols-4">
-            {steps.map(([t, b], i) => (
-              <li key={t} className="relative rounded-xl border border-border bg-background p-5">
-                <span className="mb-3 flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">{i + 1}</span>
-                <h3 className="font-medium">{t}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{b}</p>
-              </li>
-            ))}
-          </ol>
-          <div className="mt-10 grid gap-4 md:grid-cols-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/landing/review.png" alt="Side-by-side paper review editor" className="w-full rounded-xl border border-border shadow-sm" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/landing/result.png" alt="Student result page with score, section breakdown and rank" className="w-full rounded-xl border border-border shadow-sm" />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-20">
-        <h2 className="text-2xl font-semibold tracking-tight">One platform, four workspaces</h2>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {roles.map((r) => (
-            <div key={r.name} className="rounded-xl border border-border bg-card p-5">
-              <r.icon className="mb-3 size-5 text-primary" />
-              <h3 className="font-medium">{r.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{r.body}</p>
+            <div className="stock-tex rotate-[1.2deg] p-6 sm:p-8">
+              <h3 className="text-2xl font-semibold tracking-tight">{IS_DEMO ? "See it with a real institute’s data." : "Run your first mock this week."}</h3>
+              <p className="mt-3 text-base text-muted-foreground">
+                {IS_DEMO ? "Demo Academy has 25 students, three weeks of attendance and graded results. Log in as any role in one click." : "Register your institute. The platform team approves it and you are in."}
+              </p>
+              <Button size="lg" className="mt-6" asChild>
+                <Link href={primary.href}>{IS_DEMO ? "Open the demo" : "Get started"}</Link>
+              </Button>
             </div>
-          ))}
-        </div>
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 rounded-2xl bg-sidebar p-8 text-sidebar-foreground md:flex-row md:items-center">
-          <div>
-            <h3 className="text-xl font-semibold">{IS_DEMO ? "See it with a real coaching institute's data" : "Ready to run your first mock?"}</h3>
-            <p className="mt-1 text-sm text-sidebar-muted">{IS_DEMO ? "Log in as an admin, teacher, student or parent in one click." : "Register your institute. A platform admin approves it, then you are in."}</p>
           </div>
-          <Button size="lg" asChild>
-            <Link href={IS_DEMO ? "/login" : "/signup"}>{IS_DEMO ? "Open the demo" : "Get started"}</Link>
-          </Button>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">PrepDesk. Multi-tenant CBT platform.</footer>
+      <footer className="wrap flex flex-wrap items-center justify-between gap-4 py-8 text-sm text-muted-foreground">
+        <Wordmark className="text-foreground" />
+        <p>Multi-tenant CBT for coaching institutes.</p>
+      </footer>
     </div>
   );
 }

@@ -46,7 +46,7 @@ function Badge({ value, collapsed }: { value: number | string; collapsed: boolea
   return (
     <span
       className={cn(
-        "ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-sidebar-primary px-1.5 text-[11px] font-semibold leading-5 text-white",
+        "ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-sidebar-primary px-1.5 fig text-[11px] font-medium leading-5 text-primary",
         collapsed && "absolute right-1 top-1 ml-0 min-w-4 px-1 text-[10px] leading-4",
       )}
     >
@@ -90,7 +90,7 @@ export function AppSidebar({
       <aside
         data-collapsed={c}
         className={cn(
-          "group fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-sidebar text-sidebar-foreground transition-[width,transform] duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0",
+          "group fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-sidebar text-sidebar-foreground transition-transform duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           c && "md:w-[68px]",
         )}
@@ -113,7 +113,7 @@ export function AppSidebar({
               href={primaryAction.href}
               title={primaryAction.label}
               className={cn(
-                "flex h-9 items-center justify-center gap-2 rounded-md bg-sidebar-primary px-3 text-sm font-medium text-white hover:brightness-110",
+                "btn-card flex h-10 items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium",
               )}
             >
               {primaryAction.icon && <primaryAction.icon className="size-4 shrink-0" />}
@@ -126,7 +126,7 @@ export function AppSidebar({
           {groups.map((g, gi) => (
             <div key={g.label ?? gi}>
               {g.label && (
-                <div className={cn("px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted", c && "md:hidden")}>
+                <div className={cn("px-2 pb-1 text-xs font-medium text-sidebar-muted", c && "md:hidden")}>
                   {g.label}
                 </div>
               )}
@@ -168,8 +168,9 @@ function NavRow({
 
   const Icon = item.icon;
   const base =
-    "relative flex h-9 w-full items-center gap-3 rounded-md px-2.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground";
-  const activeCls = "bg-sidebar-accent text-sidebar-foreground font-medium";
+    "relative flex h-9 w-full items-center gap-3 rounded-md px-2.5 text-sm text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground";
+  const activeCls =
+    "bg-sidebar-accent text-sidebar-foreground font-medium before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-sidebar-primary";
   // Dashboard-style roots ("/admin") must match exactly, otherwise every page highlights it.
   const active = hasChildren ? false : isActive(pathname, item.href, item.href ? item.href.split("/").length <= 2 : false);
 
@@ -271,7 +272,7 @@ export function SidebarProfileCard({
         </div>
       )}
       <div className="flex items-center gap-2.5">
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-xs font-semibold text-white">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-xs font-semibold text-primary">
           {initials}
         </div>
         {true && (

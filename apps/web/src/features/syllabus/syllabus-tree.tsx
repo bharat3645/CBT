@@ -117,7 +117,7 @@ function Row({ node, depth, open, toggle, status, percentByNode, actions, busy }
           <span className="inline-block size-4" />
         )}
         <span className={cn("text-sm", depth === 0 ? "font-semibold" : node.level === "subject" ? "font-medium" : "")}>{node.name}</span>
-        <span className="hidden text-[11px] uppercase tracking-wide text-muted-foreground sm:inline">{LEVEL_LABEL[node.level]}</span>
+        <span className="hidden text-xs text-muted-foreground sm:inline">{LEVEL_LABEL[node.level]}</span>
         {!isTopic && kids.length > 0 && <span className="text-[11px] text-muted-foreground">{countTopics(node)} topics</span>}
 
         <span className="ml-auto flex items-center gap-2">

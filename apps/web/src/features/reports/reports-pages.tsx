@@ -148,7 +148,7 @@ function ReportCard({ href, icon, title, text }: { href: string; icon: React.Rea
   return (
     <Link href={href} className="block">
       <Card className="h-full p-4 transition-colors hover:bg-muted/50">
-        <div className="mb-2 text-primary">{icon}</div>
+        <div className="mb-2 text-link">{icon}</div>
         <h2 className="text-sm font-semibold">{title}</h2>
         <p className="mt-1 text-xs text-muted-foreground">{text}</p>
       </Card>

@@ -42,7 +42,7 @@ export function TeacherAttendancePage() {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["attendance-roster"] }),
   });
   const setAll = (s: Status) => setMarks(Object.fromEntries((roster.data ?? []).map((r) => [r.studentUserId, s])));
-  const counts = STATUSES.map((s) => `${Object.values(marks).filter((v) => v === s).length} ${s}`).join(" · ");
+  const counts = STATUSES.map((s) => `${Object.values(marks).filter((v) => v === s).length} ${s}`).join(", ");
   return (
     <>
       <PageHeader title="Attendance" subtitle="Mark class attendance for a batch. Absences notify the student and their parents." />

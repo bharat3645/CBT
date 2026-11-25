@@ -34,7 +34,7 @@ export function PaperUploadForm() {
       <h1 className="text-xl font-semibold tracking-tight">Upload paper</h1>
       <input aria-label="Title" placeholder="Title (optional)" className="w-full rounded border px-3 py-2 text-sm" value={title} onChange={(e) => setTitle(e.target.value)} />
       <input aria-label="Paper file" type="file" accept=".docx,.pdf" className="block text-sm" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-      {err && <p role="alert" className="text-sm text-red-600">{err}</p>}
+      {err && <p role="alert" className="text-sm text-destructive">{err}</p>}
       <button disabled={busy} className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50">{busy ? "Uploading..." : "Upload and convert"}</button>
     </form>
   );

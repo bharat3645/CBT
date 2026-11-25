@@ -6,9 +6,9 @@ import type { ApprovalBlocked, Draft } from '@cbt/contracts';
 import { ApprovalBlockedError, paperApi } from './api';
 
 const LABEL_STYLE: Record<Draft['label'], string> = {
-  EXTRACTED: 'bg-emerald-100 text-emerald-800',
-  'AI-INFERRED': 'bg-amber-100 text-amber-800',
-  MANUAL: 'bg-sky-100 text-sky-800',
+  EXTRACTED: 'bg-success/15 text-success',
+  'AI-INFERRED': 'bg-exam-flagged/25 text-foreground',
+  MANUAL: 'bg-accent text-accent-foreground',
 };
 
 const openErrors = (d: Draft) => d.flags.filter((f) => f.severity === 'error' && !f.resolved);
@@ -58,10 +58,10 @@ export function PaperReviewEditor({ paperId }: { paperId: string }) {
   const selected = paper?.drafts.find((d) => d.id === selectedId) ?? null;
 
   if (isLoading) return <p className="p-6 text-sm">Loading paper...</p>;
-  if (error || !paper) return <p className="p-6 text-sm text-red-600">Could not load paper.</p>;
+  if (error || !paper) return <p className="p-6 text-sm text-destructive">Could not load paper.</p>;
   if (paper.status === 'parsing') return <p className="p-6 text-sm">Converting document... this page updates automatically.</p>;
   if (paper.status === 'failed' || paper.status === 'rejected')
-    return <p className="p-6 text-sm text-red-600">Paper {paper.status}: {paper.parseError ?? 'see scan result'}</p>;
+    return <p className="p-6 text-sm text-destructive">Paper {paper.status}: {paper.parseError ?? 'see scan result'}</p>;
 
   const frozen = paper.status === 'approved';
   const isPdf = paper.filename.toLowerCase().endsWith('.pdf');
@@ -71,7 +71,7 @@ export function PaperReviewEditor({ paperId }: { paperId: string }) {
     <div className="flex h-[calc(100vh-4rem)] flex-col">
       <header className="flex flex-wrap items-center gap-3 border-b px-4 py-2">
         <h1 className="text-base font-semibold">{paper.title}</h1>
-        <span className="text-xs text-neutral-500">
+        <span className="text-xs text-muted-foreground">
           {paper.questionCount} questions, {paper.openFlagCount} open flags, {paper.missingKeyCount} without key
         </span>
         <label className="ml-auto flex items-center gap-1 text-xs">
@@ -81,14 +81,14 @@ export function PaperReviewEditor({ paperId }: { paperId: string }) {
         <button
           disabled={frozen || approve.isPending}
           onClick={() => approve.mutate()}
-          className="rounded bg-emerald-600 px-3 py-1 text-sm text-white disabled:opacity-50"
+          className="rounded bg-success px-3 py-1 text-sm text-white disabled:opacity-50"
         >
           {frozen ? 'Approved (frozen)' : 'Approve paper'}
         </button>
       </header>
 
       {blocked && (
-        <div role="alert" className="border-b bg-red-50 px-4 py-2 text-sm text-red-800">
+        <div role="alert" className="border-b bg-destructive/10 px-4 py-2 text-sm text-destructive">
           <strong>Cannot approve:</strong> {blocked.message}
           {blocked.openFlags.length > 0 && (
             <div>
@@ -106,12 +106,12 @@ export function PaperReviewEditor({ paperId }: { paperId: string }) {
 
       <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] md:grid-cols-2 md:grid-rows-none">
         {/* Original pane */}
-        <section className="max-h-40 min-h-0 overflow-auto border-b bg-neutral-100 md:max-h-none md:border-b-0 md:border-r" aria-label="Original document">
+        <section className="max-h-40 min-h-0 overflow-auto border-b bg-muted md:max-h-none md:border-b-0 md:border-r" aria-label="Original document">
           {paper.originalUrl && isPdf ? (
             <iframe title="Original" src={`${paper.originalUrl}#page=${page}`} className="h-full w-full" />
           ) : (
             <div className="p-4 text-sm">
-              <p className="mb-2 text-neutral-600">
+              <p className="mb-2 text-muted-foreground">
                 DOCX has no fixed pages.{' '}
                 {paper.originalUrl && (
                   <a className="underline" href={paper.originalUrl}>
@@ -120,7 +120,7 @@ export function PaperReviewEditor({ paperId }: { paperId: string }) {
                 )}
               </p>
               {selected && (
-                <p className="rounded border bg-white p-2 text-xs">
+                <p className="rounded border bg-card p-2 text-xs">
                   Source paragraphs {selected.source.blockStart} to {selected.source.blockEnd}
                 </p>
               )}
@@ -145,7 +145,7 @@ export function PaperReviewEditor({ paperId }: { paperId: string }) {
             >
               Map answer key
             </button>
-            {saveKey.isError && <span className="ml-2 text-xs text-red-600">{(saveKey.error as Error).message}</span>}
+            {saveKey.isError && <span className="ml-2 text-xs text-destructive">{(saveKey.error as Error).message}</span>}
           </div>
           <ul className="min-h-0 flex-1 overflow-auto">
             {drafts.map((d) => (
@@ -183,17 +183,17 @@ function DraftRow(props: {
   return (
     <li
       onClick={props.onSelect}
-      className={`border-b p-3 text-sm ${selected ? 'bg-sky-50' : ''} ${openErrors(d).length ? 'border-l-4 border-l-red-500' : ''}`}
+      className={`border-b p-3 text-sm ${selected ? 'bg-accent' : ''} ${openErrors(d).length ? 'border-l-4 border-l-red-500' : ''}`}
     >
       <div className="mb-1 flex items-center gap-2 text-xs">
         <b>Q{d.number}</b>
-        {d.section && <span className="text-neutral-500">{d.section}</span>}
+        {d.section && <span className="text-muted-foreground">{d.section}</span>}
         <span className={`rounded px-1.5 py-0.5 ${LABEL_STYLE[d.label]}`}>{d.label}</span>
-        <span className={low ? 'font-semibold text-red-600' : 'text-neutral-500'}>
+        <span className={low ? 'font-semibold text-destructive' : 'text-muted-foreground'}>
           {Math.round(d.confidence * 100)}%
         </span>
-        <span className="ml-auto text-neutral-500">
-          Key: {d.answer ?? props.keyAnswer ?? <em className="text-red-600">missing</em>}
+        <span className="ml-auto text-muted-foreground">
+          Key: {d.answer ?? props.keyAnswer ?? <em className="text-destructive">missing</em>}
         </span>
       </div>
       <textarea
@@ -216,7 +216,7 @@ function DraftRow(props: {
             disabled={frozen}
             title="Mark as correct answer"
             onClick={() => props.onSave({ answer: o.label })}
-            className={`rounded border px-1 text-xs ${(d.answer ?? props.keyAnswer) === o.label ? 'bg-emerald-100' : ''}`}
+            className={`rounded border px-1 text-xs ${(d.answer ?? props.keyAnswer) === o.label ? 'bg-success/15' : ''}`}
           >
             Key
           </button>
@@ -235,7 +235,7 @@ function DraftRow(props: {
         <ul className="mt-2 space-y-1">
           {d.flags.map((f) => (
             <li key={f.code} className="flex items-center gap-2 text-xs">
-              <span className={f.resolved ? 'text-neutral-400 line-through' : f.severity === 'error' ? 'text-red-700' : 'text-amber-700'}>
+              <span className={f.resolved ? 'text-muted-foreground line-through' : f.severity === 'error' ? 'text-destructive' : 'text-foreground'}>
                 {f.message}
               </span>
               {!f.resolved && !frozen && (
@@ -249,7 +249,7 @@ function DraftRow(props: {
       )}
       {dirty && !frozen && (
         <button
-          className="mt-2 rounded bg-sky-600 px-2 py-0.5 text-xs text-white"
+          className="mt-2 rounded bg-primary px-2 py-0.5 text-xs text-primary-foreground"
           onClick={() => props.onSave({ stem, options })}
         >
           Save edits

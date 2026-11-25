@@ -67,7 +67,7 @@ function ToolButton({ label, active, onClick, children }: { label: string; activ
       aria-pressed={active}
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
-      className={cn('size-7', active && 'bg-primary/10 text-primary')}
+      className={cn('size-7', active && 'bg-accent text-accent-foreground')}
     >
       {children}
     </Button>

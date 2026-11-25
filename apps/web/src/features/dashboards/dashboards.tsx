@@ -207,7 +207,7 @@ export function TeacherDashboard() {
                     <span className="text-muted-foreground">No results yet</span>
                   </div>
                 ) : (
-                  <Bar key={b.batchId} label={`${b.name}${b.testTitle ? ` · ${b.testTitle}` : ""}`} value={Math.round(b.avgPct)} />
+                  <Bar key={b.batchId} label={`${b.name}${b.testTitle ? `, ${b.testTitle}` : ""}`} value={Math.round(b.avgPct)} />
                 ),
               )
             )}

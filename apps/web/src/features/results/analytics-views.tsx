@@ -26,7 +26,7 @@ export function StudentAnalyticsView({ studentUserId }: { studentUserId?: string
             <ResponsiveContainer>
               <LineChart data={data.trend.map((t) => ({ name: t.at.slice(5, 10), pct: t.scorePct }))}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis domain={[0, 100]} unit="%" /><Tooltip />
-                <Line dataKey="pct" name="Score %" stroke="#1d4ed8" strokeWidth={2} />
+                <Line dataKey="pct" name="Score %" stroke="var(--chart-1)" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -40,7 +40,7 @@ export function StudentAnalyticsView({ studentUserId }: { studentUserId?: string
               <BarChart data={topics} layout="vertical" margin={{ left: 16 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} /><XAxis type="number" domain={[0, 100]} unit="%" />
                 <YAxis type="category" dataKey="name" width={110} /><Tooltip />
-                <Bar dataKey="accuracy" fill="#1d4ed8" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="accuracy" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -85,7 +85,7 @@ export function BatchAnalyticsView({ batchId, testId }: { batchId?: string; test
           <div className="h-52" role="img" aria-label="Score distribution">
             <ResponsiveContainer>
               <BarChart data={dist}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="name" /><YAxis allowDecimals={false} /><Tooltip />
-                <Bar dataKey="count" name="Students" fill="#1d4ed8" radius={[4, 4, 0, 0]} /></BarChart>
+                <Bar dataKey="count" name="Students" fill="var(--chart-1)" radius={[4, 4, 0, 0]} /></BarChart>
             </ResponsiveContainer>
           </div>
         )}

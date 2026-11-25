@@ -67,27 +67,27 @@ export function TestWizard({ papers, batches = [], onDone }: { papers: WizardPap
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="space-y-4">
-        <ol className="flex gap-2 text-sm">{STEPS.map((s, i) => <li key={s} className={i === step ? "font-semibold" : "text-slate-500"}>{i + 1}. {s}</li>)}</ol>
+        <ol className="flex gap-2 text-sm">{STEPS.map((s, i) => <li key={s} className={i === step ? "font-semibold" : "text-muted-foreground"}>{i + 1}. {s}</li>)}</ol>
         {step === 0 && (
           <div className="space-y-3">
             <input className="w-full rounded border px-3 py-2" placeholder="Test title" value={title} onChange={(e) => { setTitle(e.target.value); setTitleTouched(true); }} />
             <select aria-label="Paper" className="w-full rounded border px-3 py-2" value={paperId} onChange={(e) => pickPaper(e.target.value)}>
               {papers.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
-            <ul className="text-sm text-slate-600">{paper?.sections.map((s) => <li key={s.name}>{s.name}: {s.questionIds.length} questions</li>)}</ul>
+            <ul className="text-sm text-muted-foreground">{paper?.sections.map((s) => <li key={s.name}>{s.name}: {s.questionIds.length} questions</li>)}</ul>
             <fieldset className="space-y-1 rounded border p-3" aria-label="Batches">
               <legend className="px-1 text-sm font-medium">Batches</legend>
               {batches.length === 0 ? (
-                <p className="text-xs text-slate-500">No batches yet. The test will be open to every student of the institute.</p>
+                <p className="text-xs text-muted-foreground">No batches yet. The test will be open to every student of the institute.</p>
               ) : (
                 <>
                   {batches.map((b) => (
                     <label key={b.id} className="flex cursor-pointer items-center gap-2 text-sm">
                       <input type="checkbox" checked={batchIds.includes(b.id)} onChange={() => toggleBatch(b.id)} />
-                      {b.name}{b.year ? <span className="text-xs text-slate-500">({b.year})</span> : null}
+                      {b.name}{b.year ? <span className="text-xs text-muted-foreground">({b.year})</span> : null}
                     </label>
                   ))}
-                  <p className="text-xs text-slate-500">Only students enrolled in the selected batches can take the test. Select none to open it to the whole institute.</p>
+                  <p className="text-xs text-muted-foreground">Only students enrolled in the selected batches can take the test. Select none to open it to the whole institute.</p>
                 </>
               )}
             </fieldset>
@@ -96,9 +96,9 @@ export function TestWizard({ papers, batches = [], onDone }: { papers: WizardPap
         {step === 1 && (
           <div className="space-y-2">
             {PRESET_KEYS.map((k) => (
-              <label key={k} className={`block cursor-pointer rounded border p-3 ${presetKey === k ? "border-blue-600 bg-blue-50" : ""}`}>
+              <label key={k} className={`block cursor-pointer rounded border p-3 ${presetKey === k ? "border-primary bg-accent" : ""}`}>
                 <input type="radio" checked={presetKey === k} onChange={() => setPresetKey(k)} /> <b>{DEFAULT_PRESETS[k].name}</b>
-                <div className="text-xs text-slate-600">
+                <div className="text-xs text-muted-foreground">
                   Navigation {DEFAULT_PRESETS[k].config.navigation}; +{DEFAULT_PRESETS[k].config.marking.correct} / {DEFAULT_PRESETS[k].config.marking.wrong}; strict mode {DEFAULT_PRESETS[k].config.strictLevel}
                 </div>
               </label>
@@ -115,17 +115,17 @@ export function TestWizard({ papers, batches = [], onDone }: { papers: WizardPap
         {step === 3 && (
           <div className="space-y-1 text-sm">
             <p>Create and publish <b>{title || "(untitled)"}</b> with the {DEFAULT_PRESETS[presetKey].name} preset?</p>
-            <p className="text-slate-600">For: {assignedTo}. Window: {start ? new Date(start).toLocaleString() : "?"} to {end ? new Date(end).toLocaleString() : "?"}, {duration} minutes.</p>
+            <p className="text-muted-foreground">For: {assignedTo}. Window: {start ? new Date(start).toLocaleString() : "?"} to {end ? new Date(end).toLocaleString() : "?"}, {duration} minutes.</p>
           </div>
         )}
-        {err && <p role="alert" className="text-sm text-red-600">{err}</p>}
+        {err && <p role="alert" className="text-sm text-destructive">{err}</p>}
         <div className="flex gap-2">
           {step > 0 && <button className="rounded border px-4 py-2" onClick={() => setStep(step - 1)}>Back</button>}
-          {step < 3 ? <button className="rounded bg-blue-600 px-4 py-2 text-white" onClick={() => setStep(step + 1)}>Next</button>
-            : <button disabled={busy} className="rounded bg-green-600 px-4 py-2 text-white" onClick={create}>Publish test</button>}
+          {step < 3 ? <button className="rounded bg-primary px-4 py-2 text-primary-foreground" onClick={() => setStep(step + 1)}>Next</button>
+            : <button disabled={busy} className="rounded bg-success px-4 py-2 text-white" onClick={create}>Publish test</button>}
         </div>
       </div>
-      <aside className="rounded border bg-white p-4 text-sm">
+      <aside className="rounded border bg-card p-4 text-sm">
         <h3 className="mb-2 font-semibold">Preset summary</h3>
         <dl className="space-y-1">
           <div>Marking: +{cfg.marking.correct} / {cfg.marking.wrong}</div>

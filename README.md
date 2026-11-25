@@ -144,6 +144,13 @@ Conventions: files are kebab-case; every API call from the web goes through `lib
 one global exception filter (`apps/api/src/common/http-exceptions.filter.ts`: Zod issues become 400, Postgres errors are mapped); every new route needs a case in
 `apps/api/test/isolation/cases.ts` or the route-coverage test fails.
 
+## Design system
+
+The look is Hallmark's "Coral" theme (warm paper, cotton cards, an ink sidebar, one coral signal for the settled state), applied through tokens only:
+`packages/ui/src/theme.css` holds every colour, shadow and radius, and `apps/web/src/components/stationery.tsx` builds the question paper, result sheet and teacher's note
+shown on the landing and sign-in pages from real seeded data. General Sans is self-hosted in `apps/web/src/app/fonts` (Fontshare, free for commercial use); figures use Geist Mono.
+Components never use colour literals, labels are sentence case, and the exam palette colours are reserved for meaning.
+
 ## Troubleshooting
 
 | Symptom | Fix |

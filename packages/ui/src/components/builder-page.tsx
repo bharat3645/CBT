@@ -42,8 +42,8 @@ export function BuilderPage({
 
 export function PanelSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-border bg-card p-4">
-      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
+    <section className="stock p-5">
+      <h2 className="mb-3 text-sm font-semibold text-muted-foreground">{title}</h2>
       <div className="space-y-3">{children}</div>
     </section>
   );

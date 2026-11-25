@@ -74,7 +74,11 @@ const norm = (k: string) => k.replace(UUID, ":id");
 function shiftDates(v: any, delta: number): any {
   if (typeof v === "string") return ISO.test(v) ? new Date(new Date(v).getTime() + delta).toISOString() : v;
   if (Array.isArray(v)) return v.map((x) => shiftDates(x, delta));
-  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, shiftDates(x, delta)]));
+  if (v && typeof v === "object") {
+    // The recorded storage links have expired: a PDF paper shows a bundled sample source page instead.
+    const pdf = typeof v.filename === "string" && v.filename.toLowerCase().endsWith(".pdf");
+    return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === "originalUrl" && pdf ? "/demo/source-page.html" : shiftDates(x, delta)]));
+  }
   return v;
 }
 

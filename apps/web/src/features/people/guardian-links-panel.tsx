@@ -20,7 +20,7 @@ export function GuardianLinksPanel({ parent }: { parent: Person }) {
   return (
     <div className="space-y-3 rounded-md bg-muted/50 p-3" aria-label={`Children of ${parent.name}`}>
       <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Linked children</h3>
+        <h3 className="text-sm font-semibold text-muted-foreground">Linked children</h3>
         {links.data?.length ? (
           <ul className="mt-2 flex flex-wrap gap-2">
             {links.data.map((l) => (

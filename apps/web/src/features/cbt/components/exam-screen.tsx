@@ -97,11 +97,11 @@ export function ExamScreen(props: {
   if (s.phase === "instructions") return (
     <Centered>
       <h1 className="mb-2 text-xl font-semibold">{title}</h1>
-      <p className="mb-4 max-w-md text-sm text-slate-600">
+      <p className="mb-4 max-w-md text-sm text-muted-foreground">
         The timer runs on the server and continues if you lose connection. Answers save automatically.
         {level !== "off" && " This test is monitored: switching tabs or leaving full screen is logged."}
       </p>
-      <button className="rounded bg-blue-600 px-6 py-2 text-white" onClick={() => { if (level !== "off") requestFullscreen(); dispatch({ type: "START", now: performance.now() }); }}>
+      <button className="rounded bg-primary px-6 py-2 text-primary-foreground" onClick={() => { if (level !== "off") requestFullscreen(); dispatch({ type: "START", now: performance.now() }); }}>
         Start test
       </button>
     </Centered>
@@ -110,9 +110,9 @@ export function ExamScreen(props: {
     <Centered>
       <h1 className="text-xl font-semibold">Test submitted</h1>
       <p className="mt-2">Receipt code: <code className="font-mono">{s.receiptCode}</code></p>
-      <p className="mt-1 text-sm text-slate-600">Your answers are saved. Results appear once your teacher releases them.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Your answers are saved. Results appear once your teacher releases them.</p>
       <div className="mt-4 flex justify-center gap-3">
-        {s.attemptId && <a className="rounded bg-blue-600 px-4 py-2 text-sm text-white" href={`/student/tests/results/${s.attemptId}`}>View result</a>}
+        {s.attemptId && <a className="rounded bg-primary px-4 py-2 text-sm text-primary-foreground" href={`/student/tests/results/${s.attemptId}`}>View result</a>}
         <a className="rounded border px-4 py-2 text-sm" href="/student">Back to dashboard</a>
       </div>
     </Centered>
@@ -123,11 +123,11 @@ export function ExamScreen(props: {
   const a = s.answers[q.id];
   const oneWay = s.config?.navigation === "one_way";
   return (
-    <div className="fixed inset-0 flex flex-col bg-slate-50">
+    <div className="fixed inset-0 flex flex-col bg-muted">
       <TopBar onPalette={() => setPalOpen(true)} title={title} candidate={props.candidate} remainingMs={remaining} sections={s.sections} activeSection={q.section}
         onSection={(i) => { const idx = s.questions.findIndex((x) => x.section === i); if (idx >= 0) dispatch({ type: "GOTO", index: idx, now: performance.now() }); }} />
-      {warn && <div role="alert" className="bg-amber-100 px-4 py-1 text-sm text-amber-900" onClick={() => setWarn(null)}>{warn}</div>}
-      {error && <div role="alert" className="bg-red-100 px-4 py-1 text-sm text-red-800" onClick={() => setError(null)}>{error}</div>}
+      {warn && <div role="alert" className="bg-exam-flagged/25 px-4 py-1 text-sm text-foreground" onClick={() => setWarn(null)}>{warn}</div>}
+      {error && <div role="alert" className="bg-destructive/10 px-4 py-1 text-sm text-destructive" onClick={() => setError(null)}>{error}</div>}
       <div className="flex min-h-0 flex-1">
         <QuestionPane q={q} index={s.current} selected={a?.value.selected ?? []} numeric={a?.value.numeric ?? null}
           onSelect={(id) => dispatch({ type: "SELECT", optionId: id })} onNumeric={(v) => dispatch({ type: "SET_NUMERIC", value: v })} />
@@ -144,5 +144,5 @@ export function ExamScreen(props: {
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
-  return <div className="fixed inset-0 flex flex-col items-center justify-center bg-slate-50 p-6 text-center">{children}</div>;
+  return <div className="fixed inset-0 flex flex-col items-center justify-center bg-muted p-6 text-center">{children}</div>;
 }

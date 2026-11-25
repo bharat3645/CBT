@@ -10,6 +10,7 @@ import { signOut, useSession } from "@/lib/auth-client";
 import { useDashboard } from "@/features/dashboards/api";
 import { useSelectedChild } from "@/features/parent/child";
 import { NotificationsMenu } from "@/features/notifications/notifications-menu";
+import { Wordmark } from "./stationery";
 import { navByRole, roleSlugToRole, withBadges, type RoleSlug } from "./nav-config";
 
 const NextLink = ({ href, children, ...rest }: LinkProps) => (
@@ -62,27 +63,27 @@ export function AppShell({ role, children }: { role: RoleSlug; children: React.R
             role === "parent" ? (
               <ChildSwitcher />
             ) : (
-              <Link href={`/${role}`} className="flex items-center gap-2 text-sidebar-foreground">
-                {logo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logo} alt="" className="size-7 rounded-md bg-white object-contain" />
-                ) : (
-                  <span className="flex size-7 items-center justify-center rounded-md bg-sidebar-primary text-sm font-bold text-white">P</span>
-                )}
-                <span className="font-semibold">PrepDesk</span>
-              </Link>
+              logo ? (
+                <Link href={`/${role}`} className="flex items-center gap-2 text-sidebar-foreground">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={logo} alt="" className="size-7 rounded-md bg-card object-contain" />
+                  <span className="font-semibold">PrepDesk</span>
+                </Link>
+              ) : (
+                <Wordmark href={`/${role}`} tone="board" className="text-sidebar-foreground" />
+              )
             )
           }
           footer={<SidebarProfileCard institute={instituteName} userName={name || "..."} userEmail={email} />}
         />
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur md:px-6">
+          <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background px-4 md:px-8">
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
               <Menu />
             </Button>
             <PageSearch role={role} />
             <div className="ml-auto flex items-center gap-1">
-              <span className="mr-2 hidden text-xs text-muted-foreground sm:inline">{instituteName ? `${instituteName} · ${nav.label}` : nav.label}</span>
+              <span className="mr-2 hidden text-xs text-muted-foreground sm:inline">{instituteName ? `${instituteName}, ${nav.label}` : nav.label}</span>
               <NotificationsMenu unread={dash.data?.badges.unreadNotifications ?? 0} />
               <Button
                 variant="ghost"
@@ -97,7 +98,7 @@ export function AppShell({ role, children }: { role: RoleSlug; children: React.R
               </Button>
             </div>
           </header>
-          <main className="flex-1 p-4 md:p-6">
+          <main className="flex-1 p-4 md:p-8">
             <div className="mx-auto w-full max-w-6xl">{children}</div>
           </main>
         </div>
@@ -111,7 +112,7 @@ function ChildSwitcher() {
   const { children, child, setChild, isLoading } = useSelectedChild();
   return (
     <label className="block">
-      <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted">Viewing child</span>
+      <span className="mb-1 block text-xs font-medium text-sidebar-muted">Viewing child</span>
       {isLoading ? (
         <div className="h-9 rounded-md border border-sidebar-border bg-sidebar-accent" />
       ) : children.length === 0 ? (
@@ -166,10 +167,10 @@ function PageSearch({ role }: { role: RoleSlug }) {
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         onKeyDown={(e) => { if (e.key === "Enter" && matches[0]) go(matches[0].href); if (e.key === "Escape") setOpen(false); }}
-        className="h-9 w-full rounded-md border border-input bg-muted/50 pl-9 pr-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="h-10 w-full rounded-md border border-input bg-card pl-9 pr-3 text-sm shadow-[inset_1px_1px_2px_oklch(var(--shade)/0.08)] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
       />
       {open && term && (
-        <ul role="listbox" aria-label="Matching pages" className="absolute left-0 right-0 top-10 z-30 rounded-lg border border-border bg-card p-1 shadow-lg">
+        <ul role="listbox" aria-label="Matching pages" className="absolute left-0 right-0 top-10 z-30 stock p-1">
           {matches.length === 0 ? (
             <li className="px-3 py-2 text-sm text-muted-foreground">No matching page</li>
           ) : (

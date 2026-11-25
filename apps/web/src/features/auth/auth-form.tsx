@@ -7,6 +7,7 @@ import { Button, Input, Label } from "@cbt/ui";
 import { signIn } from "@/lib/auth-client";
 import { api, ApiError } from "@/lib/api-client";
 import { errorText } from "@/components/ui-kit";
+import { PaperDesk, Wordmark } from "@/components/stationery";
 import { IS_DEMO } from "@/lib/demo/flag";
 import { DEMO_PASSWORD, DEMO_USERS } from "@/lib/demo/accounts";
 
@@ -77,48 +78,35 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   if (registered) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6" role="status">
-          <h1 className="text-lg font-semibold">Registration received</h1>
+        <div className="stock-tex w-full max-w-sm p-6" role="status">
+          <h1 className="text-xl font-semibold tracking-tight">Registration received</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {registered} is waiting for approval. You can log in once the platform team approves your institute.
           </p>
-          <Link href="/login" className="mt-4 inline-block text-sm font-medium text-accent-foreground hover:underline">Back to log in</Link>
+          <Link href="/login" className="mt-4 inline-block text-sm font-medium text-link underline underline-offset-2">Back to log in</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1fr_1.1fr]">
-      <aside className="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-10 text-sidebar-foreground lg:flex">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_50%_at_100%_0%,rgba(59,91,253,0.4),transparent),radial-gradient(50%_40%_at_0%_100%,rgba(124,58,237,0.3),transparent)]" />
-        <Link href="/" className="relative flex items-center gap-2 font-semibold">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">P</span>
-          PrepDesk
-        </Link>
-        <div className="relative">
-          <h2 className="max-w-md text-3xl font-semibold tracking-tight">Run exam prep like the real exam.</h2>
-          <ul className="mt-6 space-y-3 text-sm text-sidebar-muted">
-            {["Paper to computer-based test in minutes", "NTA-style exam screen with a server-driven timer", "Ranks, weak topics and parent-ready reports"].map((t) => (
-              <li key={t} className="flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-exam-answered" />
-                {t}
-              </li>
-            ))}
-          </ul>
+    <div className="grid min-h-screen lg:grid-cols-[1fr_1.05fr]">
+      <aside className="hidden flex-col justify-between bg-muted p-10 lg:flex">
+        <Wordmark />
+        <div>
+          <PaperDesk withNote={false} className="shadow-[var(--edge-stock)]" />
+          <h2 className="mt-8 max-w-[16ch] text-3xl font-semibold tracking-tight">Run exam prep like the real exam.</h2>
+          <p className="mt-2 max-w-[40ch] text-base text-muted-foreground">Papers become timed tests, and every result arrives with a rank and the topics to revise.</p>
         </div>
-        <p className="relative text-xs text-sidebar-muted">Isolated per institute · audit-logged · built for exam day</p>
+        <p className="text-sm text-muted-foreground">Each institute&rsquo;s data is isolated and every change is audit-logged.</p>
       </aside>
 
       <main className="flex items-center justify-center bg-background p-4 sm:p-8">
         <div className="w-full max-w-md">
-          <Link href="/" className="mb-6 flex items-center gap-2 font-semibold lg:hidden">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">P</span>
-            PrepDesk
-          </Link>
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-            <h1 className="text-xl font-semibold">{isSignup ? "Create your account" : "Welcome back"}</h1>
-            <p className="mb-5 mt-1 text-sm text-muted-foreground">{isSignup ? "Set up your institute workspace." : "Log in to continue."}</p>
+          <Wordmark className="mb-6 lg:hidden" />
+          <div className="stock-tex p-6 sm:p-8">
+            <h1 className="text-2xl font-semibold tracking-tight">{isSignup ? "Create your account" : "Welcome back"}</h1>
+            <p className="mb-6 mt-1 text-sm text-muted-foreground">{isSignup ? "Set up your institute workspace." : "Log in to continue."}</p>
             <form onSubmit={onSubmit} className="space-y-4">
               {isSignup && (
                 <>
@@ -145,37 +133,37 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   {error}
                 </p>
               )}
-              <Button type="submit" className="w-full" disabled={loading || !ready}>
+              <Button type="submit" size="lg" className="w-full" disabled={loading || !ready}>
                 {loading ? "Please wait..." : isSignup ? "Sign up" : "Log in"}
               </Button>
             </form>
           </div>
 
           {!isSignup && (IS_DEMO || SHOW_DEMO_LOGINS) && (
-            <section aria-label="Demo accounts" className="mt-5 rounded-xl border border-dashed border-border bg-card/60 p-4">
-              <h2 className="text-sm font-semibold">Try a demo account</h2>
-              <p className="mb-3 text-xs text-muted-foreground">One click signs you in. Password for all: <code className="rounded bg-muted px-1">{DEMO_PASSWORD}</code></p>
-              <div className="grid gap-2 sm:grid-cols-2">
+            <section aria-label="Demo accounts" className="mt-6">
+              <h2 className="text-base font-semibold">Try a demo account</h2>
+              <p className="mb-3 mt-0.5 text-sm text-muted-foreground">One click signs you in. Password for all: <code className="fig rounded bg-muted px-1.5 py-0.5 text-[13px]">{DEMO_PASSWORD}</code></p>
+              <div className="grid gap-3 sm:grid-cols-2">
                 {DEMO_USERS.filter((u) => u.role !== "super_admin").map((u) => (
                   <button
                     key={u.email}
                     type="button"
                     disabled={loading || !ready}
                     onClick={() => quickLogin(u.email, DEMO_PASSWORD)}
-                    className="rounded-lg border border-border bg-background px-3 py-2 text-left transition hover:border-primary hover:bg-accent disabled:opacity-50"
+                    className="btn-card flex flex-col justify-start rounded-lg px-3.5 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                   >
-                    <span className="block text-sm font-medium capitalize">{u.role === "admin" ? "Institute admin" : u.role}</span>
-                    <span className="block text-xs text-muted-foreground">{u.blurb}</span>
+                    <span className="block text-sm font-semibold capitalize">{u.role === "admin" ? "Institute admin" : u.role}</span>
+                    <span className="mt-0.5 block text-[13px] leading-snug text-muted-foreground">{u.blurb}</span>
                   </button>
                 ))}
               </div>
             </section>
           )}
 
-          <p className="mt-4 text-center text-sm text-muted-foreground">
+          <p className="mt-5 text-center text-sm text-muted-foreground">
             {isSignup ? "Already have an account? " : IS_DEMO ? "" : "New institute? "}
             {(isSignup || !IS_DEMO) && (
-              <Link href={isSignup ? "/login" : "/signup"} className="font-medium text-accent-foreground hover:underline">
+              <Link href={isSignup ? "/login" : "/signup"} className="font-medium text-link underline underline-offset-2">
                 {isSignup ? "Log in" : "Sign up"}
               </Link>
             )}

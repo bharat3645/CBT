@@ -28,7 +28,7 @@ export function BatchDetail({ id, base, canManage }: { id: string; base: "/admin
       </Link>
       <PageHeader
         title={b.name}
-        subtitle={`${b.year ?? "No year"}${b.code ? ` · ${b.code}` : ""} · ${b.studentCount} students, ${b.teacherCount} teachers`}
+        subtitle={`${b.year ?? "No year"}${b.code ? `, ${b.code}` : ""}, ${b.studentCount} students, ${b.teacherCount} teachers`}
         actions={
           canManage ? (
             <Button variant="outline" disabled={update.isPending} onClick={() => update.mutate({ status: b.status === "active" ? "archived" : "active" })}>

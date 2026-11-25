@@ -7,7 +7,7 @@ import type { ResultView as Result } from '@cbt/contracts/results';
 import { reportUrl, useResult } from './api';
 
 const fmtTime = (s: number) => `${Math.floor(s / 60)}m ${s % 60}s`;
-const accColor = (v: number) => (v >= 70 ? '#15803d' : v >= 50 ? '#b45309' : '#b91c1c');
+const accColor = (v: number) => (v >= 70 ? 'var(--success)' : v >= 50 ? 'var(--exam-flagged)' : 'var(--destructive)');
 
 function Kpi({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
@@ -70,8 +70,8 @@ export function ResultSummary({ r }: { r: Result }) {
               <BarChart data={sectionData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" /><YAxis /><Tooltip />
-                <Bar dataKey="max" name="Max" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="score" name="Score" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="max" name="Max" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="score" name="Score" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -100,7 +100,7 @@ export function ResultSummary({ r }: { r: Result }) {
               <LineChart data={history}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" /><YAxis domain={[0, 100]} unit="%" /><Tooltip />
-                <Line type="monotone" dataKey="pct" name="Score %" stroke="#1d4ed8" strokeWidth={2} dot />
+                <Line type="monotone" dataKey="pct" name="Score %" stroke="var(--chart-1)" strokeWidth={2} dot />
               </LineChart>
             </ResponsiveContainer>
           </div>

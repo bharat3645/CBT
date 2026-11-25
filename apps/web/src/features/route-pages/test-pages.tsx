@@ -54,7 +54,7 @@ export function TestsPage() {
     <div className="space-y-6">
       <h1 className="text-xl font-semibold tracking-tight">Tests</h1>
       {done && (
-        <p role="status" className="text-sm text-green-700">
+        <p role="status" className="text-sm text-success">
           Test &quot;{done.title}&quot; created and published. Test id: <code data-testid="created-test-id">{done.id}</code>
         </p>
       )}
@@ -82,7 +82,7 @@ export function TestsPage() {
         ) : (
           <div className="overflow-x-auto rounded border">
             <table className="w-full text-left text-sm">
-              <thead className="bg-muted text-xs uppercase text-muted-foreground">
+              <thead className="bg-muted text-xs text-muted-foreground">
                 <tr>
                   <th className="p-2">Test</th><th className="p-2">Batches</th><th className="p-2">Status</th>
                   <th className="p-2">Window</th><th className="p-2">Preset</th><th className="p-2 text-right">Attempts</th><th className="p-2" />
@@ -98,7 +98,7 @@ export function TestsPage() {
                     <td className="p-2">{t.presetName}</td>
                     <td className="p-2 text-right">{t.submittedCount} / {t.attemptCount}</td>
                     <td className="p-2 text-right whitespace-nowrap">
-                      <Link className="text-primary underline" href={`${base}/${t.id}/leaderboard`}>Leaderboard</Link>
+                      <Link className="text-link underline underline-offset-2" href={`${base}/${t.id}/leaderboard`}>Leaderboard</Link>
                       {t.status !== "closed" && <TestRowActions t={t} onChanged={() => void qc.invalidateQueries({ queryKey: ["tests"] })} />}
                     </td>
                   </tr>

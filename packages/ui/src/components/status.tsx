@@ -25,7 +25,7 @@ export function StatusDot({ status, className }: { status: ExamStatus; className
 
 export function StatusPill({ status, children, className }: { status: ExamStatus; children?: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2 py-0.5 text-xs font-medium", className)}>
+    <span className={cn("inline-flex items-center gap-1.5 rounded-md border border-foreground/25 bg-card px-2 py-0.5 text-xs font-medium", className)}>
       <StatusDot status={status} />
       {children ?? examStatusLabel[status]}
     </span>
