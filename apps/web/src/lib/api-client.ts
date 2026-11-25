@@ -1,3 +1,4 @@
+import "./demo/install";
 /**
  * Thin typed fetch wrapper for the REST API at /api/v1 (same-origin via the Next rewrite).
  * Feature folders should build their own query hooks on top of `api`.

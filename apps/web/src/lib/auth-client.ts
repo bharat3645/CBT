@@ -1,6 +1,7 @@
 "use client";
 
 import { createAuthClient } from "better-auth/react";
+import "./demo/install";
 
 /**
  * Better Auth client. The API (core agent) serves /api/v1/auth; next.config.ts proxies /api/* to it,
