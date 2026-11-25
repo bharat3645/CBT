@@ -21,6 +21,9 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [loading, setLoading] = React.useState(false);
   const isSignup = mode === "signup";
   const [registered, setRegistered] = React.useState<string | null>(null);
+  // Until hydration finishes the form would submit natively (a full page reload), so keep the buttons disabled.
+  const [ready, setReady] = React.useState(false);
+  React.useEffect(() => setReady(true), []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -142,7 +145,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   {error}
                 </p>
               )}
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading || !ready}>
                 {loading ? "Please wait..." : isSignup ? "Sign up" : "Log in"}
               </Button>
             </form>
@@ -157,7 +160,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   <button
                     key={u.email}
                     type="button"
-                    disabled={loading}
+                    disabled={loading || !ready}
                     onClick={() => quickLogin(u.email, DEMO_PASSWORD)}
                     className="rounded-lg border border-border bg-background px-3 py-2 text-left transition hover:border-primary hover:bg-accent disabled:opacity-50"
                   >

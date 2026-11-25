@@ -12,3 +12,6 @@ test-results
 *.tsbuildinfo
 .logs
 .next-demo
+
+.vercel
+.vercel
