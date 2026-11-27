@@ -10,6 +10,8 @@ import { Bar, ListCard, PageHeader, StatGrid, Status } from "@/components/dashbo
 import { EmptyState, ErrorNote, Loading, fmtDateTime, fmtPct } from "@/components/ui-kit";
 import { useSelectedChild } from "@/features/parent/child";
 import { AttendanceSummaryView } from "@/features/attendance/attendance-pages";
+import { PerformanceCard } from "@/features/results/performance-card";
+import { useMyAnalytics, useStudentAnalytics } from "@/features/results/api";
 import { useDashboard } from "./api";
 
 const firstName = (full: string) => full.trim().split(/\s+/)[0] || full;
@@ -65,6 +67,7 @@ export function AdminDashboard() {
   return (
     <>
       <PageHeader
+        hero
         title={`Welcome back, ${firstName(data.user.name)}`}
         subtitle={`Here is what is happening at ${data.institute?.name ?? "your institute"} today.`}
         actions={
@@ -83,7 +86,7 @@ export function AdminDashboard() {
           { label: "Average score", value: fmtPct(s.avgScorePct), hint: s.evaluatedAttempts ? `${plural(s.evaluatedAttempts, "evaluated attempt")}` : "No results yet" },
         ]}
       />
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
         {data.upcomingTests.length ? (
           <ListCard
             title="Upcoming and live tests"
@@ -124,7 +127,7 @@ export function AdminDashboard() {
         )}
       </div>
       {data.recentResults.length > 0 && (
-        <div className="mt-6">
+        <div className="mt-8">
           <ListCard
             title="Recent results"
             action={{ label: "All results", href: "/admin/results" }}
@@ -154,6 +157,7 @@ export function TeacherDashboard() {
   return (
     <>
       <PageHeader
+        hero
         title={`${greeting()}, ${firstName(data.user.name)}`}
         subtitle={`${weekday(data.generatedAt)}: ${plural(s.batches, "batch", "batches")}, ${s.papersToReview} ${s.papersToReview === 1 ? "paper needs" : "papers need"} review.`}
         actions={
@@ -172,7 +176,7 @@ export function TeacherDashboard() {
           { label: "Live now", value: String(s.liveNow), hint: "Tests open for students" },
         ]}
       />
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
         {data.papersNeedingReview.length ? (
           <ListCard
             title="Papers needing review"
@@ -193,10 +197,13 @@ export function TeacherDashboard() {
           </Card>
         )}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex-row items-center justify-between">
             <CardTitle>Batch performance (latest result per batch)</CardTitle>
+            <Link href="/teacher/insights#student-gaps" className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground transition-colors hover:bg-accent/70">
+              Per-student gaps
+            </Link>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             {data.batchPerformance.length === 0 ? (
               <EmptyState>You are not assigned to a batch yet.</EmptyState>
             ) : (
@@ -215,7 +222,7 @@ export function TeacherDashboard() {
         </Card>
       </div>
       {data.upcomingTests.length > 0 && (
-        <div className="mt-6">
+        <div className="mt-8">
           <ListCard
             title="Upcoming and live tests"
             action={{ label: "Tests", href: "/teacher/tests" }}
@@ -263,6 +270,7 @@ function ResultsCard({ results, hrefFor, action }: { results: DashboardOwnResult
 
 export function StudentDashboard() {
   const { q, data, wrongRole } = useRoleDashboard<StudentDashboardData>("student");
+  const analytics = useMyAnalytics(!!data);
   if (!data) {
     return (
       <>
@@ -276,6 +284,7 @@ export function StudentDashboard() {
   return (
     <>
       <PageHeader
+        hero
         title={`Hi ${firstName(data.user.name)}`}
         subtitle={next ? `Your next test: ${next.title}, ${fmtDateTime(next.windowStart)}.` : "No tests are scheduled right now."}
         actions={
@@ -292,7 +301,10 @@ export function StudentDashboard() {
           { label: "Upcoming tests", value: String(data.badges.upcomingTests), hint: next ? `Next: ${fmtDateTime(next.windowStart)}` : undefined },
         ]}
       />
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8">
+        <PerformanceCard analytics={analytics.data} isLoading={analytics.isLoading} moreHref="/student/weak-topics" />
+      </div>
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
         {data.upcomingTests.length ? (
           <ListCard
             title="Upcoming"
@@ -314,7 +326,7 @@ export function StudentDashboard() {
           <CardHeader>
             <CardTitle>Weak topics</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             {data.weakTopics.length === 0 ? (
               <EmptyState>Topic accuracy appears after your first released result.</EmptyState>
             ) : (
@@ -323,7 +335,7 @@ export function StudentDashboard() {
           </CardContent>
         </Card>
       </div>
-      <div className="mt-6">
+      <div className="mt-8">
         <ResultsCard results={data.recentResults} hrefFor={(r) => `/student/tests/results/${r.attemptId}`} action={{ label: "All results", href: "/student/tests/results" }} />
       </div>
     </>
@@ -334,6 +346,7 @@ export function StudentDashboard() {
 export function ParentDashboard() {
   const { child, isLoading: childLoading } = useSelectedChild();
   const { q, data, wrongRole } = useRoleDashboard<ParentDashboardData>("parent", child?.studentId ?? null);
+  const analytics = useStudentAnalytics(data?.child?.userId);
   if (childLoading || !data) {
     return (
       <>
@@ -353,22 +366,31 @@ export function ParentDashboard() {
   const s = data.stats;
   return (
     <>
-      <PageHeader title={`${firstName(data.child.name)}'s progress`} subtitle={`Updated after every released result. ${data.child.batches.map((b) => b.name).join(", ")}`} />
+      <PageHeader hero title={`${firstName(data.child.name)}'s progress`} subtitle={`Updated after every released result. ${data.child.batches.map((b) => b.name).join(", ")}`} />
       <StatGrid
         stats={[
-          { label: "Latest score", value: s.latest ? `${s.latest.score} / ${s.latest.maxScore}` : "-", hint: s.latest?.title ?? "No released result yet" },
+          { label: "Latest score", value: s.latest ? `${s.latest.score} / ${s.latest.maxScore}` : "-", hint: s.latest ? (s.latest.score < 0 ? `${s.latest.title}. Below zero after negative marking` : s.latest.title) : "No released result yet" },
           { label: "Average score", value: fmtPct(s.avgScorePct), hint: `${plural(s.testsAttempted, "test")} attempted` },
           { label: "Syllabus covered", value: s.syllabusPercent == null ? "-" : `${s.syllabusPercent}%`, hint: s.syllabusPercent == null ? "No syllabus set up" : "Across the child's batches" },
           { label: "Attendance", value: "See below", hint: "Recorded by teachers" },
         ]}
       />
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8">
+        <PerformanceCard
+          analytics={analytics.data}
+          isLoading={analytics.isLoading}
+          title={`${firstName(data.child.name)}'s performance`}
+          youLabel={`${firstName(data.child.name)}'s score`}
+          moreHref="/parent/results"
+        />
+      </div>
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <ResultsCard results={data.recentResults} hrefFor={() => `/parent/results`} action={{ label: "All results", href: "/parent/results" }} />
         <Card>
           <CardHeader>
             <CardTitle>Syllabus progress</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             {data.syllabusBySubject.length === 0 ? (
               <EmptyState>The institute has not set up a syllabus for this batch yet.</EmptyState>
             ) : (
@@ -377,8 +399,8 @@ export function ParentDashboard() {
           </CardContent>
         </Card>
       </div>
-      <div className="mt-6">
-        <h2 className="mb-3 text-sm font-semibold">Attendance</h2>
+      <div className="mt-8">
+        <h2 className="mb-4 text-lg font-bold">Attendance</h2>
         <AttendanceSummaryView studentUserId={data.child.userId} />
       </div>
     </>

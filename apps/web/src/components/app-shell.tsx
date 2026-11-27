@@ -77,13 +77,13 @@ export function AppShell({ role, children }: { role: RoleSlug; children: React.R
           footer={<SidebarProfileCard institute={instituteName} userName={name || "..."} userEmail={email} />}
         />
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background px-4 md:px-8">
+          <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur-md md:px-10">
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
               <Menu />
             </Button>
             <PageSearch role={role} />
             <div className="ml-auto flex items-center gap-1">
-              <span className="mr-2 hidden text-xs text-muted-foreground sm:inline">{instituteName ? `${instituteName}, ${nav.label}` : nav.label}</span>
+              <span className="mr-2 hidden text-xs font-semibold text-muted-foreground sm:inline">{instituteName ? `${instituteName}, ${nav.label}` : nav.label}</span>
               <NotificationsMenu unread={dash.data?.badges.unreadNotifications ?? 0} />
               <Button
                 variant="ghost"
@@ -98,8 +98,9 @@ export function AppShell({ role, children }: { role: RoleSlug; children: React.R
               </Button>
             </div>
           </header>
-          <main className="flex-1 p-4 md:p-8">
-            <div className="mx-auto w-full max-w-6xl">{children}</div>
+          <main className="flex-1 px-4 pb-20 pt-6 md:px-10 md:pb-20 md:pt-10">
+            {/* keyed by route so every page's sections rise in once on arrival */}
+            <div key={pathname} className="rise mx-auto w-full max-w-6xl">{children}</div>
           </main>
         </div>
       </div>

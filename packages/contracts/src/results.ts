@@ -88,7 +88,7 @@ export const batchAnalyticsSchema = z.object({
 export type BatchAnalytics = z.infer<typeof batchAnalyticsSchema>;
 
 export const studentAnalyticsSchema = z.object({
-  trend: z.array(z.object({ testId: z.string(), at: z.string(), scorePct: z.number() })),
+  trend: z.array(z.object({ testId: z.string(), title: z.string().optional(), at: z.string(), scorePct: z.number() })),
   topics: z.array(topicBreakdownSchema),
   speedAccuracy: z.array(z.object({ topicId: z.string().nullable(), avgSec: z.number(), accuracy: z.number() })),
   recommendations: z.array(recommendationSchema),

@@ -13,6 +13,7 @@ import {
   type ProgressStatus,
 } from "./api";
 import { SyllabusTree, type TreeActions } from "./syllabus-tree";
+import { SyllabusProgressChart } from "./syllabus-chart";
 
 type Role = "admin" | "teacher" | "student" | "parent";
 
@@ -73,18 +74,11 @@ export function SyllabusPage({ role }: { role: Role }) {
               </select>
             </Field>
           )}
-          {activeBatch && progress.data && (
-            <div className="min-w-48 flex-1 pb-1">
-              <div className="mb-1 flex justify-between text-xs">
-                <span>Overall progress</span>
-                <span className="text-muted-foreground">{progress.data.overallPercent}% of topics completed</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${progress.data.overallPercent}%` }} />
-              </div>
-            </div>
-          )}
         </div>
+
+        {activeBatch && progress.data && nodes.length > 0 && (
+          <SyllabusProgressChart nodes={nodes} percentByNode={progress.data.percentByNode} overall={progress.data.overallPercent} />
+        )}
 
         <ErrorNote error={mutationError} />
         {progress.error && <ErrorNote error={progress.error} />}

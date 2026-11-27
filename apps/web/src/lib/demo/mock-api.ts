@@ -220,6 +220,18 @@ export async function handle(realFetch: typeof fetch, method: string, url: URL, 
     return rec ? json(rec.body) : json({ message: "Not found" }, 404);
   }
 
+  /* --- one student's analytics (teacher's per-student gaps): a recorded response for that student if any role has one,
+   *     otherwise a stable profile derived from the real class results so every student in the list has a graph --- */
+  m = path.match(/^\/analytics\/students\/([^/]+)$/);
+  if (m && method === "GET") {
+    const id = m[1]!;
+    const own = lookup(snap, role, method, path, "");
+    if (own && role !== "teacher" && role !== "admin") return reply(own);
+    for (const b of Object.values(snap.roles) as Record<string, Entry>[]) if (b[`GET /api/v1${path}`]) return reply(b[`GET /api/v1${path}`]!);
+    if (stu["GET /api/v1/auth/get-session"]?.body?.user?.id === id && stu["GET /api/v1/analytics/me"]) return reply(stu["GET /api/v1/analytics/me"]!);
+    return json(shiftDates(syntheticAnalytics(snap, role, id), delta));
+  }
+
   /* --- downloads --- */
   if (/\/export|\.csv$/.test(path)) return new Response("Name,Score\nDemo Student,92\n", { status: 200, headers: { "content-type": "text/csv", "content-disposition": 'attachment; filename="demo-export.csv"' } });
   if (/\/report/.test(path) && method === "GET") return new Response("%PDF-1.1\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 144]>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF", { status: 200, headers: { "content-type": "application/pdf" } });
@@ -231,6 +243,31 @@ export async function handle(realFetch: typeof fetch, method: string, url: URL, 
   }
   const e = lookup(snap, role, method, path, "");
   return e && e.status < 400 ? reply({ status: e.status, body: e.body }) : json({ ok: true, demo: true }, method === "POST" ? 201 : 200);
+}
+
+/** Deterministic per-student analytics for the demo: the class's real tests, scored around the class average. */
+function syntheticAnalytics(snap: Snapshot, role: string | null, id: string) {
+  let h = 2166136261;
+  for (const ch of id) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+  const rand = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) % 1000) / 1000;
+  const r1 = (n: number) => Math.round(Math.max(0, Math.min(100, n)) * 10) / 10;
+  const skill = (rand() - 0.5) * 44; // this student sits up to ±22 points from the class
+  const batch = lookup(snap, role, "GET", "/analytics/batch", "?reteachThreshold=50")?.body ?? { tests: [] };
+  const base = snap.roles.student?.["GET /api/v1/analytics/me"]?.body ?? { topics: [], speedAccuracy: [], recommendations: [] };
+  const tests = [...(batch.tests ?? [])].reverse();
+  const end = new Date(snap.capturedAt).getTime() - 2 * 86_400_000;
+  const trend = tests.map((t: any, i: number) => ({
+    testId: t.testId,
+    title: t.title,
+    at: new Date(end - (tests.length - 1 - i) * 7 * 86_400_000).toISOString(), // one test a week, oldest first
+    scorePct: r1(t.avgPct + skill + (rand() - 0.5) * 16),
+  }));
+  const topics = (base.topics ?? []).map((t: any) => {
+    const attempted = Math.max(t.attempted || 0, 3);
+    const correct = Math.round((Math.max(0, Math.min(100, t.accuracy + skill + (rand() - 0.5) * 30)) / 100) * attempted);
+    return { ...t, accuracy: r1((correct / attempted) * 100), correct, attempted };
+  });
+  return { trend, topics, speedAccuracy: base.speedAccuracy ?? [], recommendations: base.recommendations ?? [] };
 }
 
 function safeParse(t: string) {

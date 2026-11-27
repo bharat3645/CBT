@@ -1,10 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
-import { errorText } from "@/components/ui-kit";
+import { cn } from "@cbt/ui";
+import { Button } from "@cbt/ui";
+import { errorText, inputCls } from "@/components/ui-kit";
 import { DEFAULT_PRESETS, PRESET_KEYS, createTestInput, type PresetKey } from "@cbt/contracts/exams";
 
 const STEPS = ["Paper & sections", "Preset", "Schedule", "Review"] as const;
+
+/* Plain words for the preset settings (the codes are what the API stores). */
+const NAV_LABEL: Record<string, string> = { free: "Move freely between all questions", section_free: "Move freely within a section", one_way: "One way, no going back" };
+const PALETTE_LABEL: Record<string, string> = { five_state: "Five states (NTA style)", simple: "Simple (answered or not)" };
+const STRICT_LABEL: Record<string, string> = { off: "Off", warn: "Warn on tab switch", strict: "Strict (full screen, switches logged)" };
 
 export interface WizardPaper { id: string; title: string; sections: { name: string; questionIds: string[] }[] }
 export interface WizardBatch { id: string; name: string; year?: number | null }
@@ -67,16 +74,23 @@ export function TestWizard({ papers, batches = [], onDone }: { papers: WizardPap
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="space-y-4">
-        <ol className="flex gap-2 text-sm">{STEPS.map((s, i) => <li key={s} className={i === step ? "font-semibold" : "text-muted-foreground"}>{i + 1}. {s}</li>)}</ol>
+        <ol className="flex flex-wrap gap-2 text-sm">
+          {STEPS.map((s, i) => (
+            <li key={s} className={cn("flex items-center gap-2 rounded-full py-1 pl-1 pr-3 font-semibold", i === step ? "bg-primary text-primary-foreground" : i < step ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground")}>
+              <span className={cn("flex size-6 items-center justify-center rounded-full text-xs font-extrabold", i === step ? "bg-primary-foreground/20" : "bg-card")}>{i + 1}</span>
+              {s}
+            </li>
+          ))}
+        </ol>
         {step === 0 && (
           <div className="space-y-3">
-            <input className="w-full rounded border px-3 py-2" placeholder="Test title" value={title} onChange={(e) => { setTitle(e.target.value); setTitleTouched(true); }} />
-            <select aria-label="Paper" className="w-full rounded border px-3 py-2" value={paperId} onChange={(e) => pickPaper(e.target.value)}>
+            <input className={inputCls} placeholder="Test title" value={title} onChange={(e) => { setTitle(e.target.value); setTitleTouched(true); }} />
+            <select aria-label="Paper" className={inputCls} value={paperId} onChange={(e) => pickPaper(e.target.value)}>
               {papers.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
-            <ul className="text-sm text-muted-foreground">{paper?.sections.map((s) => <li key={s.name}>{s.name}: {s.questionIds.length} questions</li>)}</ul>
-            <fieldset className="space-y-1 rounded border p-3" aria-label="Batches">
-              <legend className="px-1 text-sm font-medium">Batches</legend>
+            <ul className="flex flex-wrap gap-2 text-xs font-semibold text-muted-foreground">{paper?.sections.map((s) => <li key={s.name} className="rounded-full bg-muted px-2.5 py-1">{s.name}: {s.questionIds.length} questions</li>)}</ul>
+            <fieldset className="space-y-2 rounded-lg border border-border bg-card p-4" aria-label="Batches">
+              <legend className="px-1 text-sm font-bold">Batches</legend>
               {batches.length === 0 ? (
                 <p className="text-xs text-muted-foreground">No batches yet. The test will be open to every student of the institute.</p>
               ) : (
@@ -96,10 +110,10 @@ export function TestWizard({ papers, batches = [], onDone }: { papers: WizardPap
         {step === 1 && (
           <div className="space-y-2">
             {PRESET_KEYS.map((k) => (
-              <label key={k} className={`block cursor-pointer rounded border p-3 ${presetKey === k ? "border-primary bg-accent" : ""}`}>
+              <label key={k} className={cn("block cursor-pointer rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/60", presetKey === k && "border-primary bg-accent ring-1 ring-primary")}>
                 <input type="radio" checked={presetKey === k} onChange={() => setPresetKey(k)} /> <b>{DEFAULT_PRESETS[k].name}</b>
                 <div className="text-xs text-muted-foreground">
-                  Navigation {DEFAULT_PRESETS[k].config.navigation}; +{DEFAULT_PRESETS[k].config.marking.correct} / {DEFAULT_PRESETS[k].config.marking.wrong}; strict mode {DEFAULT_PRESETS[k].config.strictLevel}
+                  {NAV_LABEL[DEFAULT_PRESETS[k].config.navigation]}. Marking +{DEFAULT_PRESETS[k].config.marking.correct} / {DEFAULT_PRESETS[k].config.marking.wrong}. Strict mode: {STRICT_LABEL[DEFAULT_PRESETS[k].config.strictLevel]}.
                 </div>
               </label>
             ))}
@@ -107,9 +121,9 @@ export function TestWizard({ papers, batches = [], onDone }: { papers: WizardPap
         )}
         {step === 2 && (
           <div className="space-y-3">
-            <label className="block text-sm">Duration (minutes)<input type="number" min={1} className="mt-1 w-full rounded border px-3 py-2" value={duration} onChange={(e) => setDuration(+e.target.value)} /></label>
-            <label className="block text-sm">Window opens<input type="datetime-local" className="mt-1 w-full rounded border px-3 py-2" value={start} onChange={(e) => setWindow((w) => ({ ...w, start: e.target.value }))} /></label>
-            <label className="block text-sm">Window closes<input type="datetime-local" className="mt-1 w-full rounded border px-3 py-2" value={end} onChange={(e) => setWindow((w) => ({ ...w, end: e.target.value }))} /></label>
+            <label className="block text-xs font-bold">Duration (minutes)<input type="number" min={1} className={cn(inputCls, "mt-1")} value={duration} onChange={(e) => setDuration(+e.target.value)} /></label>
+            <label className="block text-xs font-bold">Window opens<input type="datetime-local" className={cn(inputCls, "mt-1")} value={start} onChange={(e) => setWindow((w) => ({ ...w, start: e.target.value }))} /></label>
+            <label className="block text-xs font-bold">Window closes<input type="datetime-local" className={cn(inputCls, "mt-1")} value={end} onChange={(e) => setWindow((w) => ({ ...w, end: e.target.value }))} /></label>
           </div>
         )}
         {step === 3 && (
@@ -120,19 +134,19 @@ export function TestWizard({ papers, batches = [], onDone }: { papers: WizardPap
         )}
         {err && <p role="alert" className="text-sm text-destructive">{err}</p>}
         <div className="flex gap-2">
-          {step > 0 && <button className="rounded border px-4 py-2" onClick={() => setStep(step - 1)}>Back</button>}
-          {step < 3 ? <button className="rounded bg-primary px-4 py-2 text-primary-foreground" onClick={() => setStep(step + 1)}>Next</button>
-            : <button disabled={busy} className="rounded bg-success px-4 py-2 text-white" onClick={create}>Publish test</button>}
+          {step > 0 && <Button variant="outline" onClick={() => setStep(step - 1)}>Back</Button>}
+          {step < 3 ? <Button onClick={() => setStep(step + 1)}>Next</Button>
+            : <Button disabled={busy} onClick={create}>Publish test</Button>}
         </div>
       </div>
-      <aside className="rounded border bg-card p-4 text-sm">
-        <h3 className="mb-2 font-semibold">Preset summary</h3>
-        <dl className="space-y-1">
-          <div>Marking: +{cfg.marking.correct} / {cfg.marking.wrong}</div>
-          <div>Navigation: {cfg.navigation}</div>
-          <div>Palette: {cfg.palette}</div>
-          <div>Numeric answers: {cfg.numeric.enabled ? `yes (${cfg.numeric.decimals} dp)` : "no"}</div>
-          <div>Strict mode: {cfg.strictLevel}</div>
+      <aside className="stock h-fit p-5 text-sm">
+        <h3 className="mb-3 text-base font-bold">Preset summary</h3>
+        <dl className="space-y-2 [&_b]:block [&_b]:text-xs [&_b]:uppercase [&_b]:tracking-wider [&_b]:text-muted-foreground">
+          <div><b>Marking</b>+{cfg.marking.correct} correct, {cfg.marking.wrong} wrong</div>
+          <div><b>Navigation</b>{NAV_LABEL[cfg.navigation] ?? cfg.navigation}</div>
+          <div><b>Question palette</b>{PALETTE_LABEL[cfg.palette] ?? cfg.palette}</div>
+          <div><b>Numerical answers</b>{cfg.numeric.enabled ? `Yes, ${cfg.numeric.decimals} decimal places` : "No"}</div>
+          <div><b>Strict mode</b>{STRICT_LABEL[cfg.strictLevel] ?? cfg.strictLevel}</div>
         </dl>
       </aside>
     </div>

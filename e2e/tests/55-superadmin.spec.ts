@@ -56,7 +56,7 @@ test("self-serve signup -> super admin approves -> new admin uses an empty insti
   await loginAs(page, adminEmail, PASSWORD);
   await expect(page).toHaveURL(/\/admin/);
   await expect(page.getByText(/Application error|Something went wrong/i)).toHaveCount(0);
-  await expect(page.getByRole("main")).toContainText(/Good (morning|afternoon|evening)|Overview|Dashboard/i);
+  await expect(page.getByRole("main")).toContainText(/Welcome back|Good (morning|afternoon|evening)|Overview|Dashboard/i);
   await page.waitForTimeout(1500);
   await shot(page, "55-new-admin-empty-dashboard");
 

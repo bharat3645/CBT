@@ -192,20 +192,22 @@ test("results, reports, practice, attendance and feedback pages are real or hone
   const csv = await (await import("node:fs/promises")).readFile((await dl.path())!, "utf8");
   expect(csv.split("\n")[0]).toBe("test_id,title,participants,avg_pct,median_pct");
 
+  // practice, attendance and feedback are real pages now (they were "Phase 2" placeholders when this test was written)
   await login(page, "student");
   await page.goto("/student/practice");
-  await expect(page.getByText("Phase 2").first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Where to focus" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Practice", exact: true })).toBeVisible();
+  await expect(page.getByText(/Could not|Something went wrong/)).toHaveCount(0);
 
   await login(page, "teacher");
   await page.goto("/teacher/attendance");
-  await expect(page.getByText("Phase 2").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Attendance", exact: true })).toBeVisible();
 
   await login(page, "parent");
   await page.goto("/parent/attendance");
-  await expect(page.getByText("Phase 2").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Attendance", exact: true })).toBeVisible();
   await page.goto("/parent/feedback");
-  await expect(page.getByText("Phase 2").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Feedback and updates" })).toBeVisible();
+  await expect(page.getByText("Phase 2")).toHaveCount(0);
   await page.goto("/parent/results");
   await expect(page.getByRole("heading", { name: "Results" })).toBeVisible();
   await expect(page.getByText("Demo Student's released test results.")).toBeVisible();

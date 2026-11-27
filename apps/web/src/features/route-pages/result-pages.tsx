@@ -2,39 +2,53 @@
 import Link from "next/link";
 import { LeaderboardView, ResultPage } from "@/features/results";
 import { useMyResults } from "@/features/results/api";
+import { PageHeader } from "@/components/dashboard-kit";
+import { EmptyState, ErrorNote, Loading, Table, Td, fmtDateTime } from "@/components/ui-kit";
 
 export function MyResultsPage() {
   const { data, isLoading, error } = useMyResults();
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold tracking-tight">Results</h1>
+    <>
+      <PageHeader title="Results" subtitle="Every released result, newest first. Open one for the full breakdown." />
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <Loading />
       ) : error ? (
-        <p role="alert" className="text-sm">Could not load results.</p>
+        <ErrorNote error={error} />
       ) : !data?.length ? (
-        <p className="text-sm text-muted-foreground">No results yet.</p>
+        <EmptyState>No results yet. They appear here once your teacher releases them.</EmptyState>
       ) : (
-        <ul className="divide-y rounded border text-sm">
-          {data.map((r) => (
-            <li key={r.attemptId}>
-              <Link href={`/student/tests/results/${r.attemptId}`} className="flex justify-between p-3 hover:bg-muted">
-                <span>{r.title}</span>
-                <span>{r.score} / {r.maxScore}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <Table head={["Test", "Score", "Percent", "Released"]}>
+          {data.map((r) => {
+            const pct = r.maxScore ? Math.round((r.score / r.maxScore) * 1000) / 10 : 0;
+            return (
+              <tr key={r.attemptId} className="transition-colors hover:bg-muted/60">
+                <Td>
+                  <Link href={`/student/tests/results/${r.attemptId}`} className="font-bold hover:underline">{r.title}</Link>
+                </Td>
+                <Td className="fig">{r.score} / {r.maxScore}</Td>
+                <Td>
+                  <div className="flex items-center gap-3">
+                    <div className="hidden h-2 w-28 overflow-hidden rounded-full bg-muted sm:block">
+                      <div className="fill-in h-full rounded-full bg-primary" style={{ width: `${Math.max(0, Math.min(100, pct))}%` }} />
+                    </div>
+                    <span className="fig text-sm">{pct}%</span>
+                  </div>
+                </Td>
+                <Td className="text-muted-foreground">{fmtDateTime(r.evaluatedAt)}</Td>
+              </tr>
+            );
+          })}
+        </Table>
       )}
-    </div>
+    </>
   );
 }
 
 export const AttemptResultPage = ({ attemptId }: { attemptId: string }) => <ResultPage attemptId={attemptId} />;
 
 export const TestLeaderboardPage = ({ testId }: { testId: string }) => (
-  <div className="space-y-4">
-    <h1 className="text-xl font-semibold tracking-tight">Leaderboard</h1>
+  <>
+    <PageHeader title="Leaderboard" subtitle="Ranks for this test, computed once results are released." />
     <LeaderboardView testId={testId} />
-  </div>
+  </>
 );

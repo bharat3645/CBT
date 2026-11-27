@@ -46,7 +46,7 @@ export function InstituteSettings() {
   if (inst.error || !inst.data) return <ErrorNote error={inst.error ?? new Error("Could not load the institute")} />;
   const i = inst.data;
   const colorOk = !form.brandColor || HEX.test(form.brandColor);
-  const preview = HEX.test(form.brandColor) ? form.brandColor : "#c2543b";
+  const preview = HEX.test(form.brandColor) ? form.brandColor : "#5c3a24";
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -70,10 +70,10 @@ export function InstituteSettings() {
               <input type="email" className={inputCls} value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Brand colour" hint={colorOk ? "Used for buttons and highlights. Leave empty for the default." : "Use a 6 digit hex colour such as #c2543b."}>
+              <Field label="Brand colour" hint={colorOk ? "Used for buttons and highlights. Leave empty for the default." : "Use a 6 digit hex colour such as #5c3a24."}>
                 <div className="flex items-center gap-2">
                   <input aria-label="Pick brand colour" type="color" value={preview} onChange={(e) => setForm({ ...form, brandColor: e.target.value })} className="h-9 w-12 cursor-pointer rounded-md border border-input bg-card p-1" />
-                  <input aria-label="Brand colour" className={inputCls} placeholder="#c2543b" value={form.brandColor} onChange={(e) => setForm({ ...form, brandColor: e.target.value })} />
+                  <input aria-label="Brand colour" className={inputCls} placeholder="#5c3a24" value={form.brandColor} onChange={(e) => setForm({ ...form, brandColor: e.target.value })} />
                 </div>
               </Field>
               <Field label="Logo URL" hint="A link to a square image (PNG, JPG, SVG).">

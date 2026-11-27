@@ -1,20 +1,13 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
-import localFont from "next/font/local";
+import { Fraunces, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/lib/query-provider";
 import { DemoBanner } from "@/lib/demo/bootstrap";
 
-// General Sans (Fontshare, free for commercial use) carries every label and heading; Geist Mono sets figures in columns.
-const general = localFont({
-  src: [
-    { path: "./fonts/general-sans-400.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/general-sans-500.woff2", weight: "500", style: "normal" },
-    { path: "./fonts/general-sans-600.woff2", weight: "600", style: "normal" },
-  ],
-  variable: "--font-general",
-  display: "swap",
-});
+// Plus Jakarta Sans (OFL) carries every label and paragraph, up to an 800 weight for bold UI text.
+// Fraunces (OFL) sets page titles and headline figures. Geist Mono stays for code and the exam clock.
+const body = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-body", display: "swap" });
+const serif = Fraunces({ subsets: ["latin"], weight: ["600", "700", "800"], variable: "--font-serif", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
 
 export const metadata: Metadata = {
@@ -24,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${general.variable} ${mono.variable}`}>
+    <html lang="en" className={`${body.variable} ${serif.variable} ${mono.variable}`}>
       <body className="min-h-screen antialiased">
         <QueryProvider>{children}</QueryProvider>
         <DemoBanner />

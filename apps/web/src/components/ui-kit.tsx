@@ -44,16 +44,16 @@ export function Field({ label, hint, children, className }: { label: string; hin
   return (
     <div className={cn("space-y-1", className)}>
       <label className="block space-y-1">
-        <span className="text-xs font-medium">{label}</span>
+        <span className="text-xs font-bold">{label}</span>
         {children}
       </label>
-      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }
 
 export const inputCls =
-  "flex h-9 w-full rounded-md border border-input bg-card px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
+  "flex h-10 w-full rounded-lg border border-input bg-card px-3 text-sm font-semibold placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
 
 export function Pill({ tone = "neutral", children }: { tone?: "neutral" | "good" | "warn" | "bad"; children: React.ReactNode }) {
   const tones = {
@@ -62,17 +62,17 @@ export function Pill({ tone = "neutral", children }: { tone?: "neutral" | "good"
     warn: "bg-exam-flagged/15 text-foreground",
     bad: "bg-destructive/10 text-destructive",
   };
-  return <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", tones[tone])}>{children}</span>;
+  return <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold", tones[tone])}>{children}</span>;
 }
 
 export function Table({ head, children, className }: { head: string[]; children: React.ReactNode; className?: string }) {
   return (
     <div className={cn("overflow-x-auto rounded-lg border border-border bg-card", className)}>
-      <table className="w-full text-left text-sm">
+      <table className="w-full min-w-[600px] text-left text-sm">
         <thead>
-          <tr className="border-b border-border text-xs text-muted-foreground">
+          <tr className="border-b border-border bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
             {head.map((h, i) => (
-              <th key={`${h}-${i}`} className="px-4 py-2.5 font-medium">
+              <th key={`${h}-${i}`} className="px-4 py-3 font-bold">
                 {h}
               </th>
             ))}
@@ -84,14 +84,14 @@ export function Table({ head, children, className }: { head: string[]; children:
   );
 }
 
-export const Td = ({ className, ...p }: React.TdHTMLAttributes<HTMLTableCellElement>) => <td className={cn("border-t border-border px-4 py-2.5 align-middle", className)} {...p} />;
+export const Td = ({ className, ...p }: React.TdHTMLAttributes<HTMLTableCellElement>) => <td className={cn("border-t border-border px-4 py-3 align-middle", className)} {...p} />;
 
 export function Panel({ title, description, children, className }: { title?: string; description?: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={cn("rounded-lg border border-border bg-card p-4", className)}>
-      {title && <h2 className="text-sm font-semibold">{title}</h2>}
-      {description && <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>}
-      <div className={title || description ? "mt-3" : ""}>{children}</div>
+    <section className={cn("stock p-5 md:p-6", className)}>
+      {title && <h2 className="text-base font-bold">{title}</h2>}
+      {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+      <div className={title || description ? "mt-4" : ""}>{children}</div>
     </section>
   );
 }

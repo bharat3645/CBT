@@ -35,7 +35,7 @@ export function TopBar(p: { title: string; candidate: string; remainingMs: numbe
           <span role="timer" aria-live="off" className={`rounded-md px-3 py-1 fig text-lg ${low ? "bg-destructive/10 text-destructive" : "bg-muted"}`}>
             {formatClock(p.remainingMs)}
           </span>
-          {p.onPalette && <button type="button" onClick={p.onPalette} className="rounded border px-3 py-2 text-sm md:hidden">Palette</button>}
+          {p.onPalette && <button type="button" onClick={p.onPalette} className="rounded-md border border-input bg-card px-3 py-2 text-sm md:hidden">Palette</button>}
         </div>
       </div>
       <nav className="flex gap-1 overflow-x-auto px-3 md:px-4" aria-label="Sections">
@@ -83,11 +83,11 @@ export function Palette(p: { s: ExamState; onGoto: (i: number) => void; simple?:
   const section = p.s.questions[p.s.current]?.section ?? 0;
   return (
     <aside className={`${p.open ? "fixed inset-y-0 right-0 z-30 flex shadow-xl" : "hidden"} w-72 max-w-[85vw] flex-col border-l border-border bg-card md:static md:z-auto md:flex md:max-w-none md:shadow-none`} aria-label="Question palette">
-      {p.onClose && <button type="button" onClick={p.onClose} className="m-2 self-end rounded border px-3 py-2 text-sm md:hidden">Close</button>}
+      {p.onClose && <button type="button" onClick={p.onClose} className="m-2 self-end rounded-md border border-input bg-card px-3 py-2 text-sm md:hidden">Close</button>}
       <ul className="grid grid-cols-2 gap-1 p-3 text-xs">
         {(Object.keys(STATUS_LABEL) as QuestionStatus[]).filter((k) => !p.simple || k === "not_visited" || k === "answered" || k === "not_answered").map((k) => (
           <li key={k} className="flex items-center gap-2">
-            <span className={`inline-flex h-6 w-6 items-center justify-center text-[11px] ${STATUS_STYLE[k]}`}>{counts[k]}</span>
+            <span className={`inline-flex h-6 w-6 items-center justify-center text-xs ${STATUS_STYLE[k]}`}>{counts[k]}</span>
             {STATUS_LABEL[k]}
           </li>
         ))}

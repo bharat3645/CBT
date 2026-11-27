@@ -108,7 +108,7 @@ function Row({ node, depth, open, toggle, status, percentByNode, actions, busy }
 
   return (
     <li role="treeitem" aria-expanded={kids.length ? expanded : undefined}>
-      <div className="group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/60" style={{ paddingLeft: 8 + depth * 20 }}>
+      <div className="group flex min-w-0 items-center gap-2 rounded-md px-2 py-2 transition-colors hover:bg-muted/60" style={{ paddingLeft: 8 + depth * 20 }}>
         {kids.length ? (
           <button onClick={() => toggle(node.id)} aria-label={expanded ? `Collapse ${node.name}` : `Expand ${node.name}`} className="text-muted-foreground">
             {expanded ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
@@ -116,17 +116,17 @@ function Row({ node, depth, open, toggle, status, percentByNode, actions, busy }
         ) : (
           <span className="inline-block size-4" />
         )}
-        <span className={cn("text-sm", depth === 0 ? "font-semibold" : node.level === "subject" ? "font-medium" : "")}>{node.name}</span>
+        <span className={cn("min-w-0 text-sm", depth === 0 ? "text-base font-bold" : node.level === "subject" ? "font-semibold" : "")}>{node.name}</span>
         <span className="hidden text-xs text-muted-foreground sm:inline">{LEVEL_LABEL[node.level]}</span>
-        {!isTopic && kids.length > 0 && <span className="text-[11px] text-muted-foreground">{countTopics(node)} topics</span>}
+        {!isTopic && kids.length > 0 && <span className="hidden shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground sm:inline">{countTopics(node)} topics</span>}
 
-        <span className="ml-auto flex items-center gap-2">
+        <span className="ml-auto flex shrink-0 items-center gap-2">
           {pct !== undefined && !isTopic && (
             <span className="flex items-center gap-2" title={`${pct}% of topics completed`}>
-              <span className="h-1.5 w-20 overflow-hidden rounded-full bg-muted">
-                <span className="block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+              <span className="hidden h-2 w-24 overflow-hidden rounded-full bg-muted sm:block">
+                <span className="fill-in block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
               </span>
-              <span className="w-9 text-right text-xs tabular-nums text-muted-foreground">{pct}%</span>
+              <span className="w-11 text-right text-xs font-bold tabular-nums text-muted-foreground">{pct}%</span>
             </span>
           )}
           {isTopic && status && (

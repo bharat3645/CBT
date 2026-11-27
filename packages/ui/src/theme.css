@@ -5,8 +5,19 @@
 /* PrepDesk theme tokens (Coral). Warm paper, cotton cards, one ink board for the sidebar, coral spent on settled state and focus.
  * Every colour, face and shadow in the app comes from these tokens; components never use literals. */
 @theme inline {
-  --font-sans: var(--font-general), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-serif), Georgia, serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Every weight sits one step heavier than Tailwind's default: the product reads bold at a glance. */
+  --font-weight-normal: 500;
+  --font-weight-medium: 600;
+  --font-weight-semibold: 700;
+  --font-weight-bold: 800;
+  /* Small text was too small to read on a laptop: the two smallest steps are a touch larger. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.15rem;
+  --text-sm: 0.9rem;
+  --text-sm--line-height: 1.35rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -37,58 +48,59 @@
   --color-exam-not-visited: var(--exam-not-visited);
   --radius-sm: 4px;
   --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
 }
 
 :root {
   color-scheme: light;
-  /* paper and ink */
-  --background: oklch(97% 0.006 55);
-  --foreground: oklch(21% 0.012 38);
-  --card: oklch(98.8% 0.0045 80);
-  --muted: oklch(94.5% 0.007 55);
-  --muted-foreground: oklch(47% 0.013 45);
-  --border: oklch(87% 0.009 55);
-  --input: oklch(66% 0.014 50);
-  --ring: oklch(54% 0.17 30);
-  --desk: oklch(94.3% 0.008 64);
-  /* ink is the primary action; coral is the one signal */
-  --primary: oklch(22% 0.011 40);
-  --primary-foreground: oklch(96.5% 0.006 70);
-  --accent: oklch(94.5% 0.022 45);
-  --accent-foreground: oklch(46% 0.16 29);
-  --link: oklch(48% 0.16 29);
-  --paid: oklch(55.5% 0.15 33);
-  --destructive: oklch(52% 0.19 27);
-  --success: oklch(46% 0.12 150);
-  /* the ink board: sidebar */
-  --sidebar: oklch(22% 0.011 40);
-  --sidebar-foreground: oklch(96.5% 0.006 70);
-  --sidebar-muted: oklch(74% 0.012 60);
-  --sidebar-accent: oklch(29% 0.013 40);
-  --sidebar-border: oklch(31% 0.012 40);
-  --sidebar-primary: oklch(74% 0.125 30);
+  /* Cream paper and clay brown, matched to the client's references (a clay phone case, a golden cream relief).
+   * Every text pairing is at least 4.5:1. */
+  --background: #f1e7cf;
+  --foreground: #3b281f;
+  --card: #fbf6ea;
+  --muted: #e9dcc0;
+  --muted-foreground: #6b5143;
+  --border: #dccaa6;
+  --input: #b9a07f;
+  --ring: #9a5f4a;
+  --desk: #ece0c4;
+  /* clay is the primary action; a golden cream is the one highlight */
+  --primary: #9a5f4a;
+  --primary-foreground: #fff8ee;
+  --accent: #f0dccf;
+  --accent-foreground: #84503d;
+  --link: #8a4f3b;
+  --paid: #9a5f4a;
+  --destructive: oklch(52% 0.18 28);
+  --success: oklch(48% 0.11 145);
+  /* the clay board: sidebar */
+  --sidebar: #7a4a39;
+  --sidebar-foreground: #f7eedf;
+  --sidebar-muted: #e8d0c2;
+  --sidebar-accent: #8d5845;
+  --sidebar-border: #8f5b48;
+  --sidebar-primary: #f3dfb4;
   /* exam palette: used only for meaning, never decoration */
   --exam-answered: oklch(52% 0.13 150);
   --exam-not-answered: oklch(55% 0.19 27);
   --exam-review: oklch(48% 0.14 310);
   --exam-flagged: oklch(77% 0.15 78);
-  --exam-not-visited: oklch(84% 0.01 60);
+  --exam-not-visited: oklch(84% 0.02 70);
 
   /* stationery: one light from the left, every shade falls right */
-  --shade: 32% 0.03 50;
-  --lit: 100% 0.005 80;
-  --deep: 7% 0.01 40;
-  --edge-stock: inset 0 1px 0 oklch(var(--lit) / 0.9), inset 0 -1px 0 oklch(var(--shade) / 0.07), 0 0 0 0.5px oklch(var(--shade) / 0.22), 0 1px 0 oklch(var(--shade) / 0.12);
-  --cast-flat: 2px 2px 4px -3px oklch(var(--shade) / 0.22);
-  --cast-stock: 6px 5px 10px -6px oklch(var(--shade) / 0.3);
-  --cast-stock-lift: 12px 10px 18px -8px oklch(var(--shade) / 0.3);
+  --shade: 40% 0.06 45;
+  --lit: 100% 0.01 85;
+  --deep: 10% 0.02 45;
+  --edge-stock: inset 0 1px 0 oklch(var(--lit) / 0.9), inset 0 -1px 0 oklch(var(--shade) / 0.06), 0 0 0 1px oklch(var(--shade) / 0.12), 0 1px 0 oklch(var(--shade) / 0.1);
+  --cast-flat: 0 2px 6px -2px oklch(var(--shade) / 0.14), 0 10px 24px -14px oklch(var(--shade) / 0.22);
+  --cast-stock: 0 4px 12px -4px oklch(var(--shade) / 0.25);
+  --cast-stock-lift: 0 14px 28px -10px oklch(var(--shade) / 0.3);
   --press-groove: inset 1px 1.5px 2px oklch(var(--shade) / 0.16), inset -1px -1px 0 oklch(var(--lit) / 0.9), 0 0 0 0.5px oklch(var(--shade) / 0.2);
-  --print: oklch(23% 0.012 38);
-  --glint: oklch(100% 0 0 / 0.1);
-  --glint-hover: oklch(100% 0 0 / 0.12);
-  --ink-hover: oklch(26% 0.012 40);
+  --print: #3b281f;
+  --glint: oklch(100% 0 0 / 0.12);
+  --glint-hover: oklch(100% 0 0 / 0.16);
+  --ink-hover: #8d5643;
   --tex-cotton: url("/tex/cotton.svg");
   --tex-desk: url("/tex/felt.svg");
 
@@ -111,7 +123,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-size: 15px;
-  line-height: 1.5;
+  font-weight: 500;
+  line-height: 1.55;
   caret-color: var(--ring);
   -webkit-font-smoothing: antialiased;
 }
@@ -125,10 +138,16 @@ body {
 h1,
 h2,
 h3 {
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: -0.015em;
   font-synthesis: none;
   text-wrap: balance;
+}
+/* Page titles are set in the display serif. */
+h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 p {
   text-wrap: pretty;
@@ -202,9 +221,9 @@ p {
     mix-blend-mode: multiply;
   }
   .fig {
-    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -219,10 +238,13 @@ p {
   }
 }
 
-/* Chart series (read by Recharts through var()): ink for the main series, a quiet stock tone for the maximum. */
+/* Chart series (read by Recharts through var()): coffee for the main series, caramel for the comparison, sand for the track. */
 :root {
-  --chart-1: oklch(34% 0.02 40);
-  --chart-2: oklch(84% 0.01 60);
+  --chart-1: #924a30; /* validated pair with chart-2 on the card surface */
+  --chart-2: #b0821a;
+  --chart-3: #e6d6b4;
+  --chart-good: oklch(55% 0.1 140);
+  --chart-bad: oklch(56% 0.15 32);
 }
 
 /* The stamp lands once: transform and opacity only, and the finished state is the default (no script needed). */
@@ -240,7 +262,8 @@ p {
     font-size: clamp(2.75rem, 5vw + 1rem, 5.25rem);
     line-height: 1.02;
     letter-spacing: var(--tracking-display);
-    font-weight: 600;
+    font-weight: 700;
+    font-family: var(--font-display);
     overflow-wrap: break-word;
     min-width: 0;
   }
@@ -248,7 +271,8 @@ p {
     font-size: clamp(2rem, 2.5vw + 1rem, 3.25rem);
     line-height: 1.05;
     letter-spacing: var(--tracking-display);
-    font-weight: 600;
+    font-weight: 700;
+    font-family: var(--font-display);
     overflow-wrap: break-word;
     min-width: 0;
   }
@@ -267,4 +291,62 @@ p {
 /* Tailwind 4 draws a bare `border` in currentColor; every hairline in the product should be a paper rule instead. */
 @layer base {
   *, ::before, ::after { border-color: var(--border); }
+}
+
+/* ---------- motion: content rises in once, cards lift under the pointer ---------- */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes grow-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@layer components {
+  /* Each direct child of a .rise container fades up, staggered. */
+  .rise > * {
+    animation: rise-in var(--dur-long) var(--ease-out) backwards;
+  }
+  .rise > *:nth-child(2) { animation-delay: 60ms; }
+  .rise > *:nth-child(3) { animation-delay: 120ms; }
+  .rise > *:nth-child(4) { animation-delay: 180ms; }
+  .rise > *:nth-child(5) { animation-delay: 240ms; }
+  .rise > *:nth-child(n + 6) { animation-delay: 300ms; }
+  .lift {
+    transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--edge-stock), var(--cast-stock-lift);
+  }
+  /* Progress fills draw in from the left. */
+  .fill-in {
+    transform-origin: left center;
+    animation: grow-x 700ms var(--ease-out) backwards;
+  }
+  /* Hero band at the top of each dashboard: warm brown gradient with a soft caramel glow. */
+  .hero-band {
+    color: var(--primary-foreground);
+    background:
+      radial-gradient(120% 140% at 100% 0%, color-mix(in oklab, var(--sidebar-primary) 38%, transparent), transparent 55%),
+      linear-gradient(120deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--sidebar)));
+    box-shadow: inset 0 1px 0 var(--glint), var(--cast-stock);
+    border-radius: var(--radius-xl);
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* On the hero band the primary action flips to a cream sheet so it stands off the brown. */
+.hero-band .btn-ink {
+  background-color: var(--card);
+  color: var(--foreground);
+  text-shadow: none;
+}
+.hero-band .btn-ink:hover {
+  background-color: oklch(100% 0.01 85);
 }

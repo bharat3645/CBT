@@ -128,7 +128,7 @@ export function AttendanceSummaryView({ studentUserId }: { studentUserId?: strin
         <Table head={["Date", "Batch", "Status"]}>
           {s.recent.map((r, i) => (
             <tr key={i}>
-              <Td>{r.date}</Td>
+              <Td>{new Date(`${r.date}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</Td>
               <Td>{r.batch}</Td>
               <Td><Pill tone={tone(r.status)}>{r.status}</Pill></Td>
             </tr>

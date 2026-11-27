@@ -221,7 +221,7 @@ export function QuestionEditor({
         <Card title="Question">
           <RichTextEditor value={draft.stem} onChange={(stem) => patch({ stem })} placeholder="Question text" minHeight={120} />
           {dups.length > 0 && (
-            <ul role="status" className="mt-2 rounded-md border border-amber-400 bg-amber-50 p-2 text-sm text-amber-900">
+            <ul role="status" className="mt-2 rounded-md border border-exam-flagged bg-exam-flagged/15 p-3 text-sm text-foreground">
               {dups.map((d) => (
                 <li key={d.questionId}>
                   Possible duplicate of <strong>{d.label}</strong> ({Math.round(d.similarity * 100)}% similar): {d.snippet}

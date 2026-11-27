@@ -80,9 +80,9 @@ export function TestsPage() {
         ) : !tests.data?.length ? (
           <p className="text-sm text-muted-foreground">No tests yet.</p>
         ) : (
-          <div className="overflow-x-auto rounded border">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-muted text-xs text-muted-foreground">
+          <div className="stock overflow-x-auto">
+            <table className="w-full min-w-[820px] text-left text-sm">
+              <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="p-2">Test</th><th className="p-2">Batches</th><th className="p-2">Status</th>
                   <th className="p-2">Window</th><th className="p-2">Preset</th><th className="p-2 text-right">Attempts</th><th className="p-2" />
@@ -142,7 +142,7 @@ function TestRowActions({ t, onChanged }: { t: StaffTest; onChanged: () => void 
       )}
       {mode === "edit" && (
         <form
-          className="space-y-2 rounded border p-2"
+          className="space-y-2 rounded-md border border-input bg-card p-2"
           onSubmit={(e) => {
             e.preventDefault();
             void run(() => api(`/tests/${t.id}`, { method: "PATCH", body: { title, windowStart: new Date(start).toISOString(), windowEnd: new Date(end).toISOString() } }), "Test updated.");
@@ -158,7 +158,7 @@ function TestRowActions({ t, onChanged }: { t: StaffTest; onChanged: () => void 
         </form>
       )}
       {mode === "cancel" && (
-        <div className="space-y-2 rounded border p-2 text-xs">
+        <div className="space-y-2 rounded-md border border-input bg-card p-2 text-xs">
           <p>Cancel &quot;{t.title}&quot;? Students will no longer see or start it. Submitted attempts and results are kept.</p>
           <div className="flex gap-2">
             <Button size="sm" variant="destructive" disabled={busy} onClick={() => void run(() => api(`/tests/${t.id}/cancel`, { method: "POST" }), "Test cancelled.")}>Yes, cancel test</Button>

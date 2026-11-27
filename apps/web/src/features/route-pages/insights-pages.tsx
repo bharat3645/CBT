@@ -1,27 +1,52 @@
 "use client";
 import { useState } from "react";
+import { PageHeader } from "@/components/dashboard-kit";
+import { Field, inputCls } from "@/components/ui-kit";
+import { useBatches } from "@/features/people/api";
 import { BatchAnalyticsView, StudentAnalyticsView } from "@/features/results";
+import { StudentGaps } from "@/features/results/student-gaps";
 
 export function BatchInsightsPage({ title = "Insights" }: { title?: string }) {
+  const batches = useBatches();
   const [batchId, setBatchId] = useState("");
-  const [testId, setTestId] = useState("");
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-      <div className="flex flex-wrap gap-2 text-sm">
-        <input aria-label="Batch id" placeholder="Batch id" className="min-w-0 max-w-full rounded border p-1" value={batchId} onChange={(e) => setBatchId(e.target.value.trim())} />
-        <input aria-label="Test id" placeholder="Test id" className="min-w-0 max-w-full rounded border p-1" value={testId} onChange={(e) => setTestId(e.target.value.trim())} />
+    <>
+      <PageHeader title={title} subtitle="How your batches are doing, and where each student stands against the class." />
+      <div className="space-y-12">
+        <section id="student-gaps" className="scroll-mt-24">
+          <h2 className="mb-1 text-xl font-bold">Per-student gaps</h2>
+          <p className="mb-5 text-sm text-muted-foreground">Pick a student to see their score against the class average in every test, and the topics they need help with.</p>
+          <StudentGaps />
+        </section>
+        <section>
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="mb-1 text-xl font-bold">Class overview</h2>
+              <p className="text-sm text-muted-foreground">Averages, score spread and topics to reteach.</p>
+            </div>
+            <Field label="Batch" className="w-64">
+              <select aria-label="Batch" className={inputCls} value={batchId} onChange={(e) => setBatchId(e.target.value)}>
+                <option value="">All my batches</option>
+                {(batches.data ?? []).map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          <BatchAnalyticsView batchId={batchId || undefined} />
+        </section>
       </div>
-      <BatchAnalyticsView batchId={batchId || undefined} testId={testId || undefined} />
-    </div>
+    </>
   );
 }
 
 export function StudentInsightsPage() {
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold tracking-tight">Weak topics and analytics</h1>
+    <>
+      <PageHeader title="Weak topics and analytics" subtitle="Your score over time, accuracy by topic, and what to practise next." />
       <StudentAnalyticsView />
-    </div>
+    </>
   );
 }

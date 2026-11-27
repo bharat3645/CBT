@@ -122,6 +122,10 @@ test("teacher", async ({ page }) => {
     await page.getByLabel("Batch").selectOption(b.id);
     await page.waitForTimeout(700);
   }
+  // Insights > per-student gaps: every student's own analytics, so the demo shows each student's real numbers
+  const students = (await getJson(page, "/feedback/students")) ?? [];
+  for (const s of students) await store(page, "teacher", "GET", `/analytics/students/${s.studentUserId}`);
+  for (const b of batches) await store(page, "teacher", "GET", `/analytics/batch?batchId=${b.id}&reteachThreshold=50`);
 });
 
 test("student (incl. live exam + practice keys)", async ({ page }) => {

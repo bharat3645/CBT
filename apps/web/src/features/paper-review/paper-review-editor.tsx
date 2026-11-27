@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ApprovalBlocked, Draft } from '@cbt/contracts';
 import { ApprovalBlockedError, paperApi } from './api';
+import { MathPreview } from './math-preview';
 
 const LABEL_STYLE: Record<Draft['label'], string> = {
   EXTRACTED: 'bg-success/15 text-success',
@@ -136,12 +137,12 @@ export function PaperReviewEditor({ paperId }: { paperId: string }) {
               onChange={(e) => setKeyText(e.target.value)}
               placeholder="Paste answer key, e.g. 1-A, 2-C, 3-B"
               disabled={frozen}
-              className="h-14 w-full rounded border p-1 text-xs"
+              className="h-14 w-full rounded-md border border-input bg-card p-1 text-xs"
             />
             <button
               disabled={frozen || !keyText.trim() || saveKey.isPending}
               onClick={() => saveKey.mutate()}
-              className="mt-1 rounded border px-2 py-0.5 text-xs disabled:opacity-50"
+              className="mt-1 rounded-md border border-input bg-card px-2 py-0.5 text-xs disabled:opacity-50"
             >
               Map answer key
             </button>
@@ -200,27 +201,31 @@ function DraftRow(props: {
         value={stem}
         disabled={frozen}
         onChange={(e) => setStem(e.target.value)}
-        className="w-full rounded border p-1"
+        className="w-full rounded-md border border-input bg-card p-2"
         rows={2}
       />
+      <MathPreview text={stem} />
       {options.map((o, i) => (
-        <div key={o.label} className="mt-1 flex items-center gap-1">
+        <React.Fragment key={o.label}>
+        <div className="mt-1 flex items-center gap-1">
           <span className="w-6 text-xs font-medium">{o.label}</span>
           <input
             value={o.text}
             disabled={frozen}
             onChange={(e) => setOptions(options.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)))}
-            className="flex-1 rounded border px-1 py-0.5"
+            className="flex-1 rounded-md border border-input bg-card px-1 py-0.5"
           />
           <button
             disabled={frozen}
             title="Mark as correct answer"
             onClick={() => props.onSave({ answer: o.label })}
-            className={`rounded border px-1 text-xs ${(d.answer ?? props.keyAnswer) === o.label ? 'bg-success/15' : ''}`}
+            className={`rounded-md border border-input bg-card px-1 text-xs ${(d.answer ?? props.keyAnswer) === o.label ? 'bg-success/15' : ''}`}
           >
             Key
           </button>
         </div>
+        {o.text.includes("$") && <div className="ml-7"><MathPreview text={o.text} /></div>}
+        </React.Fragment>
       ))}
       {d.type === 'numeric' && (
         <input
@@ -228,7 +233,7 @@ function DraftRow(props: {
           disabled={frozen}
           placeholder="Numeric answer"
           onBlur={(e) => e.target.value !== (d.answer ?? '') && props.onSave({ answer: e.target.value || null })}
-          className="mt-1 rounded border px-1 py-0.5"
+          className="mt-1 rounded-md border border-input bg-card px-1 py-0.5"
         />
       )}
       {d.flags.length > 0 && (

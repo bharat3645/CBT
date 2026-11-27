@@ -1,44 +1,47 @@
 'use client';
 
-import {
-  Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
-} from 'recharts';
+import { Download } from 'lucide-react';
+import { Button } from '@cbt/ui';
+import { PageHeader } from '@/components/dashboard-kit';
+import { ScoreTrendChart, TopicAccuracyChart, shortDate, type TrendPoint } from '@/components/charts';
+import { EmptyState, Loading, Panel } from '@/components/ui-kit';
 import type { ResultView as Result } from '@cbt/contracts/results';
 import { reportUrl, useResult } from './api';
 
 const fmtTime = (s: number) => `${Math.floor(s / 60)}m ${s % 60}s`;
-const accColor = (v: number) => (v >= 70 ? 'var(--success)' : v >= 50 ? 'var(--exam-flagged)' : 'var(--destructive)');
 
 function Kpi({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="rounded-lg border p-3">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="text-2xl font-semibold tabular-nums">{value}</div>
-      {sub ? <div className="text-xs text-muted-foreground">{sub}</div> : null}
+    <div className="stock lift relative overflow-hidden p-4">
+      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-sidebar-primary" />
+      <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="stat-value mt-1.5 text-3xl">{value}</div>
+      {sub ? <div className="mt-1 text-xs text-muted-foreground">{sub}</div> : null}
     </div>
   );
 }
 
 export function ResultSummary({ r }: { r: Result }) {
   const pct = r.maxScore ? Math.round((r.score / r.maxScore) * 1000) / 10 : 0;
-  const sectionData = r.sections.map((s) => ({ name: s.sectionId, score: s.score, max: s.maxScore }));
-  const topicData = r.topics.map((t) => ({ name: t.topicName ?? 'Untagged', accuracy: t.accuracy, n: t.attempted }));
-  const history = [...r.previousTests.map((p) => ({ name: p.title ?? p.at.slice(0, 10), pct: p.scorePct })), { name: 'This test', pct }];
+  const topics = r.topics.map((t) => ({ name: t.topicName ?? 'Untagged', accuracy: t.accuracy }));
+  const history: TrendPoint[] = [
+    ...r.previousTests.map((p) => ({ label: shortDate(p.at), title: p.title, you: p.scorePct })),
+    { label: 'This test', title: r.testTitle ?? 'This test', you: pct },
+  ];
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h1 className="text-xl font-semibold">{r.testTitle ?? 'Result'}</h1>
-          <p className="text-sm text-muted-foreground">
-            Result v{r.version} (answer key v{r.keyVersion})
-            {r.versions.length > 1 ? ` - revised after an answer-key correction, ${r.versions.length} versions kept` : ''}
-          </p>
-        </div>
-        <a className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted" href={reportUrl(r.attemptId)}>Download PDF report</a>
-      </header>
+      <PageHeader
+        title={r.testTitle ?? 'Result'}
+        subtitle={`Result v${r.version} (answer key v${r.keyVersion})${r.versions.length > 1 ? `, revised after an answer-key correction, ${r.versions.length} versions kept` : ''}`}
+        actions={
+          <Button asChild variant="outline">
+            <a href={reportUrl(r.attemptId)}><Download /> Download PDF report</a>
+          </Button>
+        }
+      />
 
-      <section className="grid grid-cols-2 gap-3 md:grid-cols-6">
+      <section className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
         <Kpi label="Score" value={`${r.score} / ${r.maxScore}`} sub={`${pct}%`} />
         <Kpi label="Correct" value={r.correct} />
         <Kpi label="Incorrect" value={r.incorrect + r.partial} sub={r.partial ? `${r.partial} partial` : undefined} />
@@ -48,88 +51,72 @@ export function ResultSummary({ r }: { r: Result }) {
       </section>
 
       {r.ranks.length > 0 && (
-        <section className="rounded-lg border p-4">
-          <ul className="flex flex-wrap gap-6">
-            {r.ranks.map((k) => (
-              <li key={k.scope}>
-                <div className="text-xs capitalize text-muted-foreground">{k.scope} rank</div>
-                <div className="text-2xl font-semibold">{k.rank}<span className="text-sm font-normal text-muted-foreground"> / {k.participants}</span></div>
-                {k.percentile !== null && <div className="text-xs text-muted-foreground">Percentile {k.percentile}</div>}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-2 text-xs text-muted-foreground">{r.rankLabel}</p>
+        <section className="hero-band flex flex-wrap items-center gap-x-10 gap-y-4 px-6 py-5">
+          {r.ranks.map((k) => (
+            <div key={k.scope}>
+              <div className="text-xs font-bold uppercase tracking-wider text-primary-foreground/70">{k.scope} rank</div>
+              <div className="stat-value text-4xl">
+                #{k.rank}<span className="text-base font-semibold text-primary-foreground/70"> of {k.participants}</span>
+              </div>
+              {k.percentile !== null && <div className="text-xs font-semibold text-primary-foreground/80">Percentile {k.percentile}</div>}
+            </div>
+          ))}
+          <p className="text-xs font-semibold text-primary-foreground/70 md:ml-auto md:max-w-xs md:text-right">{r.rankLabel}</p>
         </section>
       )}
 
-      <section className="grid gap-6 md:grid-cols-2">
-        <div>
-          <h2 className="mb-2 text-sm font-medium">Section-wise marks</h2>
-          <div className="h-56" role="img" aria-label="Section-wise marks bar chart">
-            <ResponsiveContainer>
-              <BarChart data={sectionData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" /><YAxis /><Tooltip />
-                <Bar dataKey="max" name="Max" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="score" name="Score" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        <div>
-          <h2 className="mb-2 text-sm font-medium">Topic accuracy</h2>
-          <div className="h-56" role="img" aria-label="Topic accuracy bar chart">
-            <ResponsiveContainer>
-              <BarChart data={topicData} layout="vertical" margin={{ left: 16 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" domain={[0, 100]} unit="%" /><YAxis type="category" dataKey="name" width={110} /><Tooltip />
-                <Bar dataKey="accuracy" name="Accuracy %" radius={[0, 4, 4, 0]}>
-                  {topicData.map((d, i) => <Cell key={i} fill={accColor(d.accuracy)} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </section>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Panel title="Section-wise marks" description="Marks scored out of the section maximum.">
+          <ul className="space-y-4">
+            {r.sections.map((s) => {
+              const share = s.maxScore ? Math.max(0, Math.min(100, (s.score / s.maxScore) * 100)) : 0;
+              return (
+                <li key={s.sectionId}>
+                  <div className="mb-1.5 flex justify-between text-sm">
+                    <span className="font-bold">{s.sectionId}</span>
+                    <span className="fig">{s.score} <span className="font-semibold text-muted-foreground">/ {s.maxScore}</span></span>
+                  </div>
+                  <div className="h-3 overflow-hidden rounded-full bg-muted">
+                    <div className="fill-in h-full rounded-full bg-primary" style={{ width: `${share}%` }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </Panel>
+        <Panel title="Topic accuracy" description="Weakest first. Below the 40% line needs work.">
+          {topics.length === 0 ? <EmptyState>No topic data for this test.</EmptyState> : <TopicAccuracyChart topics={topics} />}
+        </Panel>
+      </div>
 
       {history.length > 1 && (
-        <section>
-          <h2 className="mb-2 text-sm font-medium">Comparison with last tests</h2>
-          <div className="h-48" role="img" aria-label="Score trend line chart">
-            <ResponsiveContainer>
-              <LineChart data={history}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" /><YAxis domain={[0, 100]} unit="%" /><Tooltip />
-                <Line type="monotone" dataKey="pct" name="Score %" stroke="var(--chart-1)" strokeWidth={2} dot />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
+        <Panel title="Comparison with your last tests">
+          <ScoreTrendChart points={history} youLabel="Score" height={220} />
+        </Panel>
       )}
 
-      <section>
-        <h2 className="mb-2 text-sm font-medium">Topics to revise and your next step</h2>
+      <Panel title="Topics to revise and your next step">
         {r.recommendations.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No recommendations yet. They appear after 5 attempts on a topic.</p>
+          <EmptyState>No recommendations yet. They appear after 5 attempts on a topic.</EmptyState>
         ) : (
-          <ul className="space-y-2">
+          <ul className="grid gap-3 md:grid-cols-2">
             {r.recommendations.map((x) => (
-              <li key={x.topicId} className="rounded-lg border p-3 text-sm">
-                <div className="font-medium">{x.topicName}</div>
-                <div className="text-muted-foreground">{x.reason}</div>
-                <div>{x.next}</div>
+              <li key={x.topicId} className="lift rounded-lg border-l-4 border-l-primary bg-muted/60 p-4 text-sm">
+                <div className="font-bold">{x.topicName}</div>
+                <div className="mt-1 text-muted-foreground">{x.reason}</div>
+                <div className="mt-1 font-semibold">{x.next}</div>
               </li>
             ))}
           </ul>
         )}
-      </section>
+      </Panel>
     </div>
   );
 }
 
 export function ResultPage({ attemptId }: { attemptId: string }) {
   const { data, isLoading, error } = useResult(attemptId);
-  if (isLoading) return <p className="p-6 text-sm text-muted-foreground">Loading result...</p>;
+  if (isLoading) return <Loading label="Loading result..." />;
   if (error || !data) return <p className="p-6 text-sm" role="alert">{(error as Error)?.message ?? 'Result unavailable'}</p>;
   return <ResultSummary r={data} />;
 }
